@@ -134,12 +134,16 @@ function Landing() {
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {staff.map((s) => (
             <li key={s.slug}>
-              <Button asChild variant="outline" className="h-auto w-full flex-col items-start p-3">
-                <a href={`/demo/${s.slug}`}>
+              <form method="post" action={`/demo/${s.slug}`}>
+                <Button
+                  type="submit"
+                  variant="outline"
+                  className="h-auto w-full flex-col items-start p-3"
+                >
                   <span>{s.name}</span>
                   <span className="font-normal text-muted-foreground">{s.role}</span>
-                </a>
-              </Button>
+                </Button>
+              </form>
             </li>
           ))}
         </ul>

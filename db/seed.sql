@@ -286,3 +286,21 @@ INSERT INTO sources (uri, author_id, dated, body, subject, expires_on) VALUES
   ('doc://izin-praktik/maya#sip', 'rina', '2024-03-01T00:00:00Z',
     'SIP drg. Maya, Sp.Ort di Klinik Gigi Senyum Sejahtera nomor 503/0087/SIP-DG/2024 berlaku sampai 1 Maret 2029.', 'maya', '2029-03-01')
 ON CONFLICT DO NOTHING;
+
+-- Next week's schedule. No patient Due for Recall is booked yet.
+INSERT INTO appointments (id, patient_no, dentist_id, starts_at) VALUES
+  (1, 'P-0002', 'andi', '2026-11-09T02:00:00Z'),
+  (2, 'P-0010', 'andi', '2026-11-09T03:00:00Z'),
+  (3, 'P-0036', 'rina', '2026-11-09T04:00:00Z'),
+  (4, 'P-0028', 'maya', '2026-11-10T09:00:00Z'),
+  (5, 'P-0029', 'maya', '2026-11-10T10:00:00Z'),
+  (6, 'P-0013', 'andi', '2026-11-11T03:00:00Z'),
+  (7, 'P-0040', 'rina', '2026-11-11T07:00:00Z')
+ON CONFLICT DO NOTHING;
+
+-- The stock card after the October stok opname (task://stok-opname/42).
+INSERT INTO stock_items (item, quantity, unit, counted_at) VALUES
+  ('Sarung tangan nitril M', 6, 'kotak', '2026-10-31T09:00:00Z'),
+  ('Masker medis', 8, 'kotak', '2026-10-31T09:00:00Z'),
+  ('Kapas gulung', 5, 'pak', '2026-10-31T09:00:00Z')
+ON CONFLICT DO NOTHING;

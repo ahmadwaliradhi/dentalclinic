@@ -10,33 +10,106 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as KlinikRouteImport } from './routes/_klinik'
+import { Route as KeluarRouteImport } from './routes/keluar'
+import { Route as KlinikAsetRouteImport } from './routes/_klinik/aset'
+import { Route as KlinikJadwalRouteImport } from './routes/_klinik/jadwal'
+import { Route as KlinikPasienRouteImport } from './routes/_klinik/pasien'
+import { Route as KlinikStokRouteImport } from './routes/_klinik/stok'
+import { Route as DemoIdRouteImport } from './routes/demo.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KlinikRoute = KlinikRouteImport.update({
+  id: '/_klinik',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KeluarRoute = KeluarRouteImport.update({
+  id: '/keluar',
+  path: '/keluar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KlinikAsetRoute = KlinikAsetRouteImport.update({
+  id: '/aset',
+  path: '/aset',
+  getParentRoute: () => KlinikRoute,
+} as any)
+const KlinikJadwalRoute = KlinikJadwalRouteImport.update({
+  id: '/jadwal',
+  path: '/jadwal',
+  getParentRoute: () => KlinikRoute,
+} as any)
+const KlinikPasienRoute = KlinikPasienRouteImport.update({
+  id: '/pasien',
+  path: '/pasien',
+  getParentRoute: () => KlinikRoute,
+} as any)
+const KlinikStokRoute = KlinikStokRouteImport.update({
+  id: '/stok',
+  path: '/stok',
+  getParentRoute: () => KlinikRoute,
+} as any)
+const DemoIdRoute = DemoIdRouteImport.update({
+  id: '/demo/$id',
+  path: '/demo/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/keluar': typeof KeluarRoute
+  '/aset': typeof KlinikAsetRoute
+  '/jadwal': typeof KlinikJadwalRoute
+  '/pasien': typeof KlinikPasienRoute
+  '/stok': typeof KlinikStokRoute
+  '/demo/$id': typeof DemoIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/keluar': typeof KeluarRoute
+  '/aset': typeof KlinikAsetRoute
+  '/jadwal': typeof KlinikJadwalRoute
+  '/pasien': typeof KlinikPasienRoute
+  '/stok': typeof KlinikStokRoute
+  '/demo/$id': typeof DemoIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_klinik': typeof KlinikRouteWithChildren
+  '/keluar': typeof KeluarRoute
+  '/_klinik/aset': typeof KlinikAsetRoute
+  '/_klinik/jadwal': typeof KlinikJadwalRoute
+  '/_klinik/pasien': typeof KlinikPasienRoute
+  '/_klinik/stok': typeof KlinikStokRoute
+  '/demo/$id': typeof DemoIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/keluar' | '/aset' | '/jadwal' | '/pasien' | '/stok' | '/demo/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/keluar' | '/aset' | '/jadwal' | '/pasien' | '/stok' | '/demo/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/_klinik'
+    | '/keluar'
+    | '/_klinik/aset'
+    | '/_klinik/jadwal'
+    | '/_klinik/pasien'
+    | '/_klinik/stok'
+    | '/demo/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  KlinikRoute: typeof KlinikRouteWithChildren
+  KeluarRoute: typeof KeluarRoute
+  DemoIdRoute: typeof DemoIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +121,80 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_klinik': {
+      id: '/_klinik'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof KlinikRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/keluar': {
+      id: '/keluar'
+      path: '/keluar'
+      fullPath: '/keluar'
+      preLoaderRoute: typeof KeluarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_klinik/aset': {
+      id: '/_klinik/aset'
+      path: '/aset'
+      fullPath: '/aset'
+      preLoaderRoute: typeof KlinikAsetRouteImport
+      parentRoute: typeof KlinikRoute
+    }
+    '/_klinik/jadwal': {
+      id: '/_klinik/jadwal'
+      path: '/jadwal'
+      fullPath: '/jadwal'
+      preLoaderRoute: typeof KlinikJadwalRouteImport
+      parentRoute: typeof KlinikRoute
+    }
+    '/_klinik/pasien': {
+      id: '/_klinik/pasien'
+      path: '/pasien'
+      fullPath: '/pasien'
+      preLoaderRoute: typeof KlinikPasienRouteImport
+      parentRoute: typeof KlinikRoute
+    }
+    '/_klinik/stok': {
+      id: '/_klinik/stok'
+      path: '/stok'
+      fullPath: '/stok'
+      preLoaderRoute: typeof KlinikStokRouteImport
+      parentRoute: typeof KlinikRoute
+    }
+    '/demo/$id': {
+      id: '/demo/$id'
+      path: '/demo/$id'
+      fullPath: '/demo/$id'
+      preLoaderRoute: typeof DemoIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface KlinikRouteChildren {
+  KlinikAsetRoute: typeof KlinikAsetRoute
+  KlinikJadwalRoute: typeof KlinikJadwalRoute
+  KlinikPasienRoute: typeof KlinikPasienRoute
+  KlinikStokRoute: typeof KlinikStokRoute
+}
+
+const KlinikRouteChildren: KlinikRouteChildren = {
+  KlinikAsetRoute: KlinikAsetRoute,
+  KlinikJadwalRoute: KlinikJadwalRoute,
+  KlinikPasienRoute: KlinikPasienRoute,
+  KlinikStokRoute: KlinikStokRoute,
+}
+
+const KlinikRouteWithChildren =
+  KlinikRoute._addFileChildren(KlinikRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  KlinikRoute: KlinikRouteWithChildren,
+  KeluarRoute: KeluarRoute,
+  DemoIdRoute: DemoIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

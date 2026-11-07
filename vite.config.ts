@@ -8,7 +8,13 @@ export default defineConfig({
   resolve: { alias: { "@": new URL("./src", import.meta.url).pathname } },
   plugins: [
     cloudflare({ viteEnvironment: { name: "ssr" } }),
-    tanstackStart(),
+    tanstackStart({
+      // Readable server function URLs, such as /_serverFn/aset, so tests can call them directly.
+      serverFns: {
+        generateFunctionId: ({ functionName }) =>
+          functionName.replace(/_createServerFn_handler$/, ""),
+      },
+    }),
     react(),
     tailwindcss(),
   ],
