@@ -64,13 +64,18 @@ it("shows the launch link, Expert zips and video from data", async () => {
   expect(html).not.toMatch(/href=""|src=""/);
 });
 
-it("names the three principles and the four agents, with the team's zip", async () => {
+it("names the three principles and the four agents, with the team's launch link and zip", async () => {
   const { html } = await landingHtml();
   const team = html.slice(html.indexOf('id="tim"'), html.indexOf('id="prinsip"'));
 
   for (const word of ["Sumber", "Izin", "Jejak"]) expect(html).toContain(word);
   for (const agent of ["Dira", "Sari", "Bima", "Wulan"]) expect(team).toContain(agent);
   expect(team).toContain(`href="${release.teamZipUrl}"`);
+  // One WorkBuddy launch link installs one Expert, so the Team has a link of its own.
+  if (release.teamLaunchUrl) {
+    expect(team).toContain(`href="${escapeHtml(release.teamLaunchUrl)}"`);
+    expect(team).toContain(">Buka Tim di WorkBuddy<");
+  }
 });
 
 it("offers Demo Login as each of the four seeded staff members", async () => {
@@ -150,7 +155,10 @@ it("walks a newcomer from Buka di WorkBuddy to the Refusal-then-answer check", a
   expect(steps).toContain("Hubungkan WorkBuddy");
   expect(steps).toContain("dental-clinic-brain");
   expect(steps).toContain("New Task");
+  // One launch link installs one Expert, so the Expert's link never promises the Team.
+  expect(steps).not.toContain("Dental Clinic Brain dan DentalClinic Team");
   // Same question twice: Refusal as Nina, then the cited answer as drg. Rina.
+  // The Team comes last, through its own launch link.
   const order = [
     "Buka di WorkBuddy",
     "Nina",
@@ -158,6 +166,7 @@ it("walks a newcomer from Buka di WorkBuddy to the Refusal-then-answer check", a
     "Connectors",
     "sebagai drg. Rina",
     "emr://",
+    ...(release.teamLaunchUrl ? ["Buka Tim di WorkBuddy"] : []),
   ];
   const positions = order.map((text) => steps.indexOf(text));
   expect(positions.every((position) => position > -1)).toBe(true);
@@ -178,6 +187,10 @@ it("heads the page with both logos and links to the tests, the video and WorkBud
   if (release.launchUrl) {
     expect(header).toContain(`href="${escapeHtml(release.launchUrl)}"`);
     expect(header).toContain(">Buka di WorkBuddy<");
+  }
+  if (release.teamLaunchUrl) {
+    expect(header).toContain(`href="${escapeHtml(release.teamLaunchUrl)}"`);
+    expect(header).toContain(">Buka Tim di WorkBuddy<");
   }
   expect(html).not.toContain("Masuk sebagai staf");
   const logo = await env.ASSETS.fetch("https://dentalclinic.test/workbuddy.png");
