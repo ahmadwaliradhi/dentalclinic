@@ -161,3 +161,18 @@ it("walks a newcomer from Buka di WorkBuddy to the Refusal-then-answer check", a
   expect(positions.every((position) => position > -1)).toBe(true);
   expect(positions).toEqual([...positions].sort((a, b) => a - b));
 });
+
+it("heads the page with both logos and links to the tests, the video and WorkBuddy", async () => {
+  const { html } = await landingHtml();
+  const header = html.slice(html.indexOf('id="site-header"'), html.indexOf('id="hero"'));
+
+  expect(header).toMatch(/<img\b[^>]*src="\/favicon\.svg"[^>]*alt="Dental Clinic"/);
+  expect(header).toMatch(/<img\b[^>]*src="\/workbuddy\.png"[^>]*alt="WorkBuddy AI"/);
+  expect(header).toMatch(/<a\b[^>]*href="#hasil-uji"[^>]*>Hasil Uji Agents</);
+  expect(header).toMatch(/<a\b[^>]*href="#video"[^>]*>Cek Video Demo</);
+  expect(header).toContain(`href="${escapeHtml(release.launchUrl)}"`);
+  expect(header).toContain(">Buka di WorkBuddy<");
+  expect(html).not.toContain("Masuk sebagai staf");
+  const logo = await env.ASSETS.fetch("https://dentalclinic.test/workbuddy.png");
+  expect(logo.status).toBe(200);
+});

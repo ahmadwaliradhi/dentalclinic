@@ -171,12 +171,7 @@ const faq = [
 function Landing() {
   return (
     <div className="mx-auto max-w-3xl px-4 sm:px-6">
-      <div className="flex items-center justify-between py-5 font-semibold">
-        <span>Dental Clinic Brain</span>
-        <a href="#demo-login" className="text-sm font-medium text-primary">
-          Masuk sebagai staf
-        </a>
-      </div>
+      <SiteHeader />
       <main>
         <Hero />
         <Section id="tim" title="Tim">
@@ -261,6 +256,44 @@ function Landing() {
         </a>
       </footer>
     </div>
+  );
+}
+
+function SiteHeader() {
+  return (
+    <header
+      id="site-header"
+      className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 py-5"
+    >
+      <span className="flex items-center gap-2 font-semibold">
+        <img src="/favicon.svg" alt="Dental Clinic" width={24} height={24} className="size-6" />
+        <span>Dental Clinic</span>
+        <span aria-hidden="true" className="text-muted-foreground">
+          ×
+        </span>
+        <img
+          src="/workbuddy.png"
+          alt="WorkBuddy AI"
+          width={24}
+          height={24}
+          className="size-6 rounded-md"
+        />
+        <span>WorkBuddy AI</span>
+      </span>
+      <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium">
+        <a href="#hasil-uji" className="hover:text-primary">
+          Hasil Uji Agents
+        </a>
+        <a href="#video" className="hover:text-primary">
+          Cek Video Demo
+        </a>
+        {release.launchUrl && (
+          <Button asChild size="sm">
+            <a href={release.launchUrl}>Buka di WorkBuddy</a>
+          </Button>
+        )}
+      </nav>
+    </header>
   );
 }
 
