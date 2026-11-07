@@ -69,6 +69,8 @@ export interface Proposal {
   phone: string | null;
   text: string;
   proposedAt: string;
+  /** When an undecided Proposal runs out and counts as declined. */
+  expiresAt: string;
   status: Status;
   /** The wa.me link a human taps to send a Recall Message; only once accepted. */
   whatsapp: string | null;
@@ -81,7 +83,7 @@ export async function inbox(caller: Staff, now = new Date()): Promise<Proposal[]
   const { results } = await env.DB.prepare(
     `SELECT proposals.id, proposals.kind, proposals.patient_no AS noRm,
        coalesce(patients.name, proposals.item) AS name, patients.phone, proposals.text,
-       proposals.proposed_at AS proposedAt, proposals.decision, proposals.decided_by AS decidedBy
+       proposals.proposed_at AS proposedAt, proposals.expires_at AS expiresAt, proposals.decision, proposals.decided_by AS decidedBy
      FROM proposals LEFT JOIN patients ON patients.no_rm = proposals.patient_no
      WHERE ${decides.sql}
      ORDER BY proposals.decision IS NOT NULL, proposals.id DESC`,
