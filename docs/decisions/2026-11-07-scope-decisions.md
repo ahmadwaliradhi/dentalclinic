@@ -67,7 +67,7 @@ Sections: hero with launch link and zip; three principles (sumber, izin, jejak);
 ## Process
 
 - WorkBuddy writes all code from tickets. Planning documents are not code.
-- Tickets are GitHub issues in `ahmadwaliradhi/dentalclinic` (public), with no tool attribution in their bodies.
+- Tickets are GitHub issues in `ahmadwaliradhi/dentalclinic` (public).
 - WorkBuddy works on a branch per ticket or batch, pushes it, and opens a PR. The owner merges on GitHub. Nobody pushes directly to `main`.
 - `docs/research/` stays untracked and local only.
 - Submit the form by 22:30 WIB.

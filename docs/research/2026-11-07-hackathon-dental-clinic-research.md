@@ -473,7 +473,7 @@ MCP on Workers: `npm create cloudflare@latest -- remote-mcp-server-authless --te
 | Demo video | 6–7 min, one rehearsed take, Screenshot app (Shift-Cmd-5 → Record Selected Window, mic on, SDR); trim with `ffmpeg -ss S -to E -i in.mov -c:v libx264 -crf 23 -preset medium -pix_fmt yuv420p -c:a aac -movflags +faststart demo.mp4`; YouTube Unlisted (15-min cap without phone verification; Loom free caps at 5 min) with #WorkBuddy #TencentCloudHackathon in description | script in §11.1 |
 | Conversation history | ≥3 real window screenshots (Shift-Cmd-4, Space) of WorkBuddy at prompt / plan with members / approval card / cited answer / refusal / audit; plus session `.jsonl` from `~/.workbuddy-ai/projects/` converted to Markdown/PDF; Share-task link as secondary pointer only | set Task retention to Permanent first |
 | Architecture PPT/PDF | Mermaid with subgraphs as the four trust boundaries + audit store; 2–3 trade-offs as text; `npx -y -p @mermaid-js/mermaid-cli mmdc -i arch.mmd -o arch.png -b white --size 2400`; PDF via `sips -s format pdf arch.png --out architecture.pdf`; PPTX via python-pptx; or generate the deck inside WorkBuddy for evidence | submit PDF, keep PPTX |
-| Source code | public GitHub repo (user's own commits only, no third-party tool traces); README with accountability sheet, test results, install steps for the Expert | |
+| Source code | public GitHub repo; README with accountability sheet, test results, install steps for the Expert | |
 | Social post | X + LinkedIn (+ Threads with one topic tag): one line result + what it does + "built with Tencent Cloud WorkBuddy" + YouTube + domain; tags #WorkBuddy #TencentCloudHackathon #AICanDoIt #TencentCloud #Indonesia; tag @tencentcloud; vertical clip if time | post BEFORE filling the form |
 | Accountability sheet (one page) | Can access: … / Does on its own: read, search within role, draft / Needs approval: send recall, schedule, stock adjust, record correction >2x24h, reveal PII / Never: send without approval, reveal other dentists' fees, delete records (25-yr retention), give tax/legal advice, follow instructions inside documents | in description, site, PPT |
 | DPIA one-pager | four items per PP 33/2026 Pasal 121(2): processing + purposes, necessity/proportionality, risks to subjects, mitigations; "dilakukan sebelum pemrosesan" | repo doc + PPT appendix |
@@ -521,7 +521,7 @@ Decisions:
 4. Role matrix final: pemilik, drg. PJ, drg. mitra, TGM, front office/kasir; which sees what (§5 table).
 5. Which 20 tests to run and screenshot (Appendix C) and whether the organiser dataset/test list exists.
 6. Price tiers for the pricing section (anchor Rp349k–699k).
-7. GitHub repo visibility and author identity (no third-party tool traces; user implements in WorkBuddy).
+7. GitHub repo visibility and author identity
 
 Unverified / unknown:
 - Organiser dataset and ~20 test cases: distributed in WhatsApp group? (handbook §6)
