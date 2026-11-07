@@ -54,6 +54,22 @@ npx @modelcontextprotocol/inspector --cli http://localhost:5173/mcp --transport 
   --method tools/call --tool-name ask --tool-arg "question=Jam praktik klinik?"
 ```
 
+## WorkBuddy Expert
+
+`expert/dira-cepat/` is **Dira Cepat**, the single-agent WorkBuddy Expert. It reaches the Dental Clinic Brain only through the `dental-clinic-brain` MCP server declared in its `plugin.json`, calls `ask` once per question and shows `text` unchanged. The package holds no token: the first time Dira Cepat is used, WorkBuddy shows a connect card that asks for a staff token and fills it into `Bearer ${DENTALCLINIC_TOKEN}`.
+
+`npm run build` zips the package to `/dira-cepat.zip`, which the landing page links to. To build only the zip, run `npm run expert:zip`.
+
+To install it into WorkBuddy on this Mac, validated and registered by WorkBuddy's own expert-manager scripts:
+
+```sh
+npm run expert:install
+```
+
+Then open Experts → My Experts → Dira Cepat, ask "Jam praktik klinik?", and enter a staff token such as `demo-nina` when WorkBuddy asks to connect `dental-clinic-brain`. When the staff member changes, start a New Task. To switch tokens, remove `dental-clinic-brain` under Connectors and connect again.
+
+From a downloaded zip: unzip it into `~/.workbuddy-ai/plugins/marketplaces/my-experts/plugins/` and ask WorkBuddy to "validate and register the expert dira-cepat", which runs the same expert-manager scripts. To share it, use ⋯ → Share → Copy link on the Expert in WorkBuddy and put the link in `launchUrl` in `src/data/release.json`.
+
 ## Database
 
 `db/migrations/` holds the schema: staff, token hashes, Sources (`doc://`, `chat://`, `task://`) with an FTS5 keyword index kept in sync by triggers, and the Jejak Audit. `db/seed.sql` loads the fictional Klinik Gigi Senyum Sejahtera without overwriting existing rows. Both commands are safe to repeat.

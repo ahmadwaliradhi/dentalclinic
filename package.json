@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev --host 127.0.0.1",
-    "build": "vite build",
+    "build": "npm run expert:zip && vite build",
     "preview": "vite preview --host 127.0.0.1",
     "lint": "oxlint --deny-warnings",
     "format": "oxfmt --write .",
@@ -15,6 +15,8 @@
     "db:migrate": "CI=true wrangler d1 migrations apply DB --config wrangler.jsonc",
     "db:seed": "CI=true wrangler d1 execute DB --config wrangler.jsonc --file db/seed.sql",
     "cf:types": "wrangler types",
+    "expert:zip": "rm -f public/dira-cepat.zip && cd expert && zip -qrX ../public/dira-cepat.zip dira-cepat -x '*.DS_Store'",
+    "expert:install": "sh scripts/install-expert.sh",
     "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
