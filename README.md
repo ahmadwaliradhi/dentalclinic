@@ -2,7 +2,7 @@
 
 Live: [dentalclinic.ahmadwaliradhi.workers.dev](https://dentalclinic.ahmadwaliradhi.workers.dev)
 
-One TanStack Start application on one Cloudflare Worker, with D1. The placeholder is Indonesian; clinic features land in later tickets. Domain vocabulary lives in [GLOSSARY.md](GLOSSARY.md), architecture in [docs/adr](docs/adr/).
+One TanStack Start application on one Cloudflare Worker, with D1. The site is Indonesian; staff talk to the Klinik Brain only through WorkBuddy. Domain vocabulary lives in [GLOSSARY.md](GLOSSARY.md), architecture in [docs/adr](docs/adr/).
 
 ## Run
 
@@ -115,4 +115,13 @@ For a separate Cloudflare account, create its D1 database and replace only `data
 
 ## UI
 
-Tailwind v4 uses neutral shadcn/ui tokens, a system font, and `components.json` aliases rooted at `src`. Add shadcn components only when a real screen needs one; this placeholder needs no buttons, labels or component library examples.
+Tailwind v4 uses neutral shadcn/ui tokens, a system font, and `components.json` aliases rooted at `src`. Add shadcn components only when a real screen needs one.
+
+## Landing page
+
+`/` is the Indonesian landing page. Its links and test results are data, not code:
+
+- `src/data/release.json`: WorkBuddy launch link, Expert zip and video embed URL. An empty value shows "Segera tersedia".
+- `src/data/test-results.json`: one row per test case. `status` is `lulus`, `gagal` or `belum`; `evidenceUrl` links the status to a screenshot.
+
+Edit the JSON and redeploy.
