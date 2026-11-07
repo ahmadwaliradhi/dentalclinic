@@ -95,8 +95,8 @@ const accountability = [
 
 const install: Step = release.launchUrl
   ? {
-      title: "Tambahkan Expert ke WorkBuddy.",
-      body: "Klik Buka di WorkBuddy di bagian atas halaman.",
+      title: "Klik Buka di WorkBuddy.",
+      body: "Tombolnya ada di bagian atas halaman ini. Jika WorkBuddy belum terpasang, pasang dan masuk dulu, lalu klik tombol itu lagi. WorkBuddy menambahkan dua Expert: Dental Clinic Brain untuk pertanyaan sehari-hari dan DentalClinic Team untuk permintaan yang lebih rumit.",
     }
   : {
       title: "Tambahkan Expert ke WorkBuddy.",
@@ -111,23 +111,33 @@ const install: Step = release.launchUrl
       ),
     };
 
+// The same path the WorkBuddy test run took: pair as Nina, see the Refusal,
+// switch to drg. Rina, see the answer (T02 and T06).
 const quickStart: Step[] = [
   install,
   {
     title: "Ajukan pertanyaan pertama.",
-    body: "Buka Experts → My Experts, pilih Dira Cepat, lalu tanya apa saja, misalnya “Jam praktik klinik?”. Dira membalas dengan tautan dan kode 8 karakter.",
+    body: "Klik New Task. Di kotak chat, pilih Dental Clinic Brain, lalu ketik “Jam praktik klinik?”. Karena ini pertama kali, Dira membalas dengan tautan dan kode 8 karakter.",
   },
   {
-    title: "Hubungkan akun Anda dalam 10 menit.",
-    body: "Buka tautan dari Dira, pilih nama Anda di Coba sebagai, tekan Hubungkan WorkBuddy, lalu balas “sudah” ke Dira.",
+    title: "Masuk sebagai Nina, Front Office.",
+    body: "Buka tautan dari Dira. Di Coba sebagai, pilih Nina, lalu tekan Hubungkan WorkBuddy. Lakukan dalam 10 menit, lalu balas “sudah” ke Dira.",
   },
   {
     title: "Tempel token.",
-    body: "Dira memberi token. Saat WorkBuddy meminta koneksi dental-clinic-brain, tempel token itu. Token hanya muncul sekali.",
+    body: "Dira memberi token. Saat WorkBuddy meminta koneksi dental-clinic-brain, tempel token itu lalu simpan. Token hanya muncul sekali. Setelah terhubung, Dira menjawab dengan sumbernya.",
   },
   {
-    title: "Ganti staf.",
-    body: "Hapus dental-clinic-brain di Connectors, ulangi dari langkah 2 sebagai staf lain, lalu mulai New Task.",
+    title: "Uji batas izin.",
+    body: "Tanya “Apa diagnosis pasien P-0007?”. Nina tidak boleh melihat rekam medis, jadi Dira menolak dan menyebut drg. Rina.",
+  },
+  {
+    title: "Ganti ke drg. Rina.",
+    body: "Buka Experts · Skills · Connectors, pilih Connectors, lalu hapus dental-clinic-brain. Klik New Task dan ulangi langkah 2 sampai 4, tetapi pilih drg. Rina. Tanya lagi soal P-0007: kali ini Dira menjawab dengan sumber emr://.",
+  },
+  {
+    title: "Coba DentalClinic Team.",
+    body: "Klik New Task, pilih DentalClinic Team, lalu tanya “Siapa yang belum selesai PSA bulan lalu? Buatkan pengingat.”. Token yang sama tetap berlaku.",
   },
 ];
 
@@ -169,6 +179,14 @@ function Landing() {
       </div>
       <main>
         <Hero />
+        <Section id="tim" title="Tim">
+          <Terms terms={team} className="grid-cols-2 sm:grid-cols-4" />
+          {release.teamZipUrl && (
+            <Button asChild variant="outline" className="mt-8">
+              <a href={release.teamZipUrl}>Unduh Tim</a>
+            </Button>
+          )}
+        </Section>
         <Section id="prinsip" title="Setiap jawaban">
           <Terms terms={principles} className="sm:grid-cols-3" />
         </Section>
@@ -188,14 +206,6 @@ function Landing() {
         </Section>
         <Section id="hasil-uji" title="Hasil uji di WorkBuddy">
           <TestResults />
-        </Section>
-        <Section id="tim" title="Tim">
-          <Terms terms={team} className="grid-cols-2 sm:grid-cols-4" />
-          {release.teamZipUrl && (
-            <Button asChild variant="outline" className="mt-8">
-              <a href={release.teamZipUrl}>Unduh Tim</a>
-            </Button>
-          )}
         </Section>
         <Section id="arsitektur" title="Arsitektur">
           <img
