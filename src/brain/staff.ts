@@ -9,15 +9,6 @@ export interface Staff {
   role: Role;
 }
 
-/** The staff member a bearer token belongs to, or null. */
-export async function staffForToken(token: string): Promise<Staff | null> {
-  return env.DB.prepare(
-    "SELECT staff.id, staff.name, staff.role FROM tokens JOIN staff ON staff.id = tokens.staff_id WHERE tokens.hash = ?",
-  )
-    .bind(await sha256(token))
-    .first<Staff>();
-}
-
 /** Seconds a web session lasts: seven days. */
 export const SESSION_SECONDS = 7 * 24 * 60 * 60;
 

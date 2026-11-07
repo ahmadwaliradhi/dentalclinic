@@ -2,31 +2,10 @@ import { exports } from "cloudflare:workers";
 import { expect, it } from "vitest";
 import { ask } from "../src/brain/ask";
 import type { Staff } from "../src/brain/staff";
-
-const SITE = "https://dentalclinic.test";
+import { demoLogin, get, SITE } from "./site";
 
 const andi: Staff = { id: "andi", name: "drg. Andi", role: "Dokter Gigi Mitra" };
 const nina: Staff = { id: "nina", name: "Nina", role: "Front Office" };
-
-/** Signs in through Demo Login and returns the session cookie. */
-async function demoLogin(id: string): Promise<string> {
-  const response = await exports.default.fetch(`${SITE}/demo/${id}`, {
-    method: "POST",
-    redirect: "manual",
-  });
-  expect(response.status).toBe(303);
-  expect(response.headers.get("location")).toBe("/pasien");
-  const cookie = response.headers.get("set-cookie") ?? "";
-  expect(cookie).toMatch(/HttpOnly/);
-  return cookie.split(";")[0];
-}
-
-function get(path: string, cookie?: string) {
-  return exports.default.fetch(`${SITE}${path}`, {
-    headers: cookie ? { cookie } : {},
-    redirect: "manual",
-  });
-}
 
 it.each([
   ["rina", "drg. Rina", "Pemilik"],
@@ -49,7 +28,7 @@ it("offers Demo Login only for the four seeded staff members", async () => {
   expect(response.headers.get("set-cookie")).toBeNull();
 });
 
-it.each(["/pasien", "/jadwal", "/stok", "/aset", "/jejak-audit"])(
+it.each(["/pasien", "/jadwal", "/stok", "/aset", "/jejak-audit", "/perangkat"])(
   "sends a logged-out visitor of %s to the Demo Login",
   async (path) => {
     const response = await get(path);

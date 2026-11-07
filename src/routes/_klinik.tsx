@@ -18,6 +18,7 @@ const views = [
   { to: "/stok", label: "Stok" },
   { to: "/aset", label: "Aset" },
   { to: "/jejak-audit", label: "Jejak Audit" },
+  { to: "/perangkat", label: "Perangkat" },
 ] as const;
 
 function Klinik() {

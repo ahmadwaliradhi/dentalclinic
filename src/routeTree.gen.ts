@@ -12,12 +12,15 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as KlinikRouteImport } from './routes/_klinik'
 import { Route as KeluarRouteImport } from './routes/keluar'
+import { Route as PairingRouteImport } from './routes/pairing'
 import { Route as KlinikAsetRouteImport } from './routes/_klinik/aset'
 import { Route as KlinikJadwalRouteImport } from './routes/_klinik/jadwal'
 import { Route as KlinikJejakAuditRouteImport } from './routes/_klinik/jejak-audit'
 import { Route as KlinikPasienRouteImport } from './routes/_klinik/pasien'
+import { Route as KlinikPerangkatRouteImport } from './routes/_klinik/perangkat'
 import { Route as KlinikStokRouteImport } from './routes/_klinik/stok'
 import { Route as DemoIdRouteImport } from './routes/demo.$id'
+import { Route as PairingTokenRouteImport } from './routes/pairing.token'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -31,6 +34,11 @@ const KlinikRoute = KlinikRouteImport.update({
 const KeluarRoute = KeluarRouteImport.update({
   id: '/keluar',
   path: '/keluar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PairingRoute = PairingRouteImport.update({
+  id: '/pairing',
+  path: '/pairing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KlinikAsetRoute = KlinikAsetRouteImport.update({
@@ -53,6 +61,11 @@ const KlinikPasienRoute = KlinikPasienRouteImport.update({
   path: '/pasien',
   getParentRoute: () => KlinikRoute,
 } as any)
+const KlinikPerangkatRoute = KlinikPerangkatRouteImport.update({
+  id: '/perangkat',
+  path: '/perangkat',
+  getParentRoute: () => KlinikRoute,
+} as any)
 const KlinikStokRoute = KlinikStokRouteImport.update({
   id: '/stok',
   path: '/stok',
@@ -63,77 +76,101 @@ const DemoIdRoute = DemoIdRouteImport.update({
   path: '/demo/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PairingTokenRoute = PairingTokenRouteImport.update({
+  id: '/token',
+  path: '/token',
+  getParentRoute: () => PairingRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/keluar': typeof KeluarRoute
+  '/pairing': typeof PairingRouteWithChildren
   '/aset': typeof KlinikAsetRoute
   '/jadwal': typeof KlinikJadwalRoute
   '/jejak-audit': typeof KlinikJejakAuditRoute
   '/pasien': typeof KlinikPasienRoute
+  '/perangkat': typeof KlinikPerangkatRoute
   '/stok': typeof KlinikStokRoute
   '/demo/$id': typeof DemoIdRoute
+  '/pairing/token': typeof PairingTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/keluar': typeof KeluarRoute
+  '/pairing': typeof PairingRouteWithChildren
   '/aset': typeof KlinikAsetRoute
   '/jadwal': typeof KlinikJadwalRoute
   '/jejak-audit': typeof KlinikJejakAuditRoute
   '/pasien': typeof KlinikPasienRoute
+  '/perangkat': typeof KlinikPerangkatRoute
   '/stok': typeof KlinikStokRoute
   '/demo/$id': typeof DemoIdRoute
+  '/pairing/token': typeof PairingTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_klinik': typeof KlinikRouteWithChildren
   '/keluar': typeof KeluarRoute
+  '/pairing': typeof PairingRouteWithChildren
   '/_klinik/aset': typeof KlinikAsetRoute
   '/_klinik/jadwal': typeof KlinikJadwalRoute
   '/_klinik/jejak-audit': typeof KlinikJejakAuditRoute
   '/_klinik/pasien': typeof KlinikPasienRoute
+  '/_klinik/perangkat': typeof KlinikPerangkatRoute
   '/_klinik/stok': typeof KlinikStokRoute
   '/demo/$id': typeof DemoIdRoute
+  '/pairing/token': typeof PairingTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/keluar'
+    | '/pairing'
     | '/aset'
     | '/jadwal'
     | '/jejak-audit'
     | '/pasien'
+    | '/perangkat'
     | '/stok'
     | '/demo/$id'
+    | '/pairing/token'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/keluar'
+    | '/pairing'
     | '/aset'
     | '/jadwal'
     | '/jejak-audit'
     | '/pasien'
+    | '/perangkat'
     | '/stok'
     | '/demo/$id'
+    | '/pairing/token'
   id:
     | '__root__'
     | '/'
     | '/_klinik'
     | '/keluar'
+    | '/pairing'
     | '/_klinik/aset'
     | '/_klinik/jadwal'
     | '/_klinik/jejak-audit'
     | '/_klinik/pasien'
+    | '/_klinik/perangkat'
     | '/_klinik/stok'
     | '/demo/$id'
+    | '/pairing/token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   KlinikRoute: typeof KlinikRouteWithChildren
   KeluarRoute: typeof KeluarRoute
+  PairingRoute: typeof PairingRouteWithChildren
   DemoIdRoute: typeof DemoIdRoute
 }
 
@@ -158,6 +195,13 @@ declare module '@tanstack/react-router' {
       path: '/keluar'
       fullPath: '/keluar'
       preLoaderRoute: typeof KeluarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pairing': {
+      id: '/pairing'
+      path: '/pairing'
+      fullPath: '/pairing'
+      preLoaderRoute: typeof PairingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_klinik/aset': {
@@ -188,6 +232,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KlinikPasienRouteImport
       parentRoute: typeof KlinikRoute
     }
+    '/_klinik/perangkat': {
+      id: '/_klinik/perangkat'
+      path: '/perangkat'
+      fullPath: '/perangkat'
+      preLoaderRoute: typeof KlinikPerangkatRouteImport
+      parentRoute: typeof KlinikRoute
+    }
     '/_klinik/stok': {
       id: '/_klinik/stok'
       path: '/stok'
@@ -202,6 +253,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pairing/token': {
+      id: '/pairing/token'
+      path: '/token'
+      fullPath: '/pairing/token'
+      preLoaderRoute: typeof PairingTokenRouteImport
+      parentRoute: typeof PairingRoute
+    }
   }
 }
 
@@ -210,6 +268,7 @@ interface KlinikRouteChildren {
   KlinikJadwalRoute: typeof KlinikJadwalRoute
   KlinikJejakAuditRoute: typeof KlinikJejakAuditRoute
   KlinikPasienRoute: typeof KlinikPasienRoute
+  KlinikPerangkatRoute: typeof KlinikPerangkatRoute
   KlinikStokRoute: typeof KlinikStokRoute
 }
 
@@ -218,16 +277,29 @@ const KlinikRouteChildren: KlinikRouteChildren = {
   KlinikJadwalRoute: KlinikJadwalRoute,
   KlinikJejakAuditRoute: KlinikJejakAuditRoute,
   KlinikPasienRoute: KlinikPasienRoute,
+  KlinikPerangkatRoute: KlinikPerangkatRoute,
   KlinikStokRoute: KlinikStokRoute,
 }
 
 const KlinikRouteWithChildren =
   KlinikRoute._addFileChildren(KlinikRouteChildren)
 
+interface PairingRouteChildren {
+  PairingTokenRoute: typeof PairingTokenRoute
+}
+
+const PairingRouteChildren: PairingRouteChildren = {
+  PairingTokenRoute: PairingTokenRoute,
+}
+
+const PairingRouteWithChildren =
+  PairingRoute._addFileChildren(PairingRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   KlinikRoute: KlinikRouteWithChildren,
   KeluarRoute: KeluarRoute,
+  PairingRoute: PairingRouteWithChildren,
   DemoIdRoute: DemoIdRoute,
 }
 export const routeTree = rootRouteImport

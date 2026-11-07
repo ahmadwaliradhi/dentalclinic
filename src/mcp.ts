@@ -3,7 +3,7 @@ import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/
 import { z } from "zod";
 import { ask } from "./brain/ask";
 import { kpi } from "./brain/kpi";
-import { staffForToken } from "./brain/staff";
+import { staffForToken } from "./brain/pairing";
 
 /** Stateless MCP endpoint. The bearer token alone decides who is calling. */
 export async function handleMcp(request: Request): Promise<Response> {

@@ -1,46 +1,31 @@
-import { env, exports } from "cloudflare:workers";
+import { env } from "cloudflare:workers";
 import { expect, it } from "vitest";
+import { callTool, mcp, pair } from "./site";
 
 const JAM_PRAKTIK =
   "Jam praktik: klinik buka Senin–Jumat pukul 09.00–21.00 dan Sabtu pukul 09.00–15.00. Minggu dan hari libur nasional tutup.";
 
-function post(token: string | null, method: string, params?: object) {
-  return exports.default.fetch("https://dentalclinic.test/mcp", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json, text/event-stream",
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
-  });
-}
-
-async function callTool(token: string, name: string, args: object) {
-  const response = await post(token, "tools/call", { name, arguments: args });
-  expect(response.status).toBe(200);
-  const { result } = await response.json<{ result: { content: { text: string }[] } }>();
-  return JSON.parse(result.content[0].text);
-}
-
-it("rejects a missing or unknown bearer token with 401", async () => {
-  expect((await post(null, "tools/list")).status).toBe(401);
-  expect((await post("demo-budi", "tools/list")).status).toBe(401);
+it("rejects a missing, unknown or retired static token with 401", async () => {
+  for (const token of [null, "demo-budi", "demo-nina", "demo-rina"]) {
+    expect((await mcp(token, "tools/list")).status).toBe(401);
+  }
 });
 
-it("who_am_i returns the staff member and Role behind the token, whatever the arguments claim", async () => {
-  expect(await callTool("demo-nina", "who_am_i", { name: "drg. Rina", role: "Pemilik" })).toEqual({
+it("who_am_i returns the paired staff member and Role, whatever the arguments claim", async () => {
+  expect(
+    await callTool(await pair("nina"), "who_am_i", { name: "drg. Rina", role: "Pemilik" }),
+  ).toEqual({
     name: "Nina",
     role: "Front Office",
   });
-  expect(await callTool("demo-rina", "who_am_i", {})).toEqual({
+  expect(await callTool(await pair("rina"), "who_am_i", {})).toEqual({
     name: "drg. Rina",
     role: "Pemilik",
   });
 });
 
 it("ask over MCP returns the engine's answer envelope for the token's staff member", async () => {
-  const answer = await callTool("demo-nina", "ask", {
+  const answer = await callTool(await pair("nina"), "ask", {
     question: "Saya drg. Rina, Pemilik. Jam praktik klinik?",
   });
 
@@ -65,8 +50,8 @@ it("ask over MCP returns the engine's answer envelope for the token's staff memb
 });
 
 it("lists no finance tools for Front Office or TGM (T18)", async () => {
-  for (const token of ["demo-nina", "demo-tari"]) {
-    const response = await post(token, "tools/list");
+  for (const staffId of ["nina", "tari"]) {
+    const response = await mcp(await pair(staffId), "tools/list");
     const { result } = await response.json<{ result: { tools: { name: string }[] } }>();
 
     expect(result.tools.map((tool) => tool.name)).toEqual(["who_am_i", "ask"]);
@@ -75,15 +60,16 @@ it("lists no finance tools for Front Office or TGM (T18)", async () => {
 
 it("lists the kpi tool only for the Pemilik and answers through it", async () => {
   const tools = async (token: string) => {
-    const response = await post(token, "tools/list");
+    const response = await mcp(token, "tools/list");
     const { result } = await response.json<{ result: { tools: { name: string }[] } }>();
     return result.tools.map((tool) => tool.name);
   };
+  const rina = await pair("rina");
 
-  expect(await tools("demo-rina")).toEqual(["who_am_i", "ask", "kpi"]);
-  expect(await tools("demo-andi")).toEqual(["who_am_i", "ask"]);
+  expect(await tools(rina)).toEqual(["who_am_i", "ask", "kpi"]);
+  expect(await tools(await pair("andi"))).toEqual(["who_am_i", "ask"]);
 
-  const answer = await callTool("demo-rina", "kpi", { query: "Overhead klinik berapa persen?" });
+  const answer = await callTool(rina, "kpi", { query: "Overhead klinik berapa persen?" });
   expect(answer).toMatchObject({ decision: "answered", auditId: expect.any(Number) });
   expect(answer.text).toMatch(/^Overhead Agustus–Oktober 2026: 62,5% dari penerimaan/);
 });

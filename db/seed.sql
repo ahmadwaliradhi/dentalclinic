@@ -8,14 +8,6 @@ INSERT INTO staff (id, name, role) VALUES
   ('nina', 'Nina', 'Front Office')
 ON CONFLICT DO NOTHING;
 
--- SHA-256 of the public demo tokens demo-rina, demo-andi, demo-tari and demo-nina.
-INSERT INTO tokens (hash, staff_id) VALUES
-  ('d7ad238857eec99aefe9303adfc1bc707608e5243f0dd52172a37548c73d19d2', 'rina'),
-  ('17bfd23338cc36f78545dbd7f3b817cd9900f4fb2be150cf121e733b807b585c', 'andi'),
-  ('c4360457007c05fba6e5fb3b2a2b775ebac0474ee5bfe4ed5652a05203749084', 'tari'),
-  ('afaa4fad048066041191848ef1dade9da69b0a1726d69f83ef1cd210ae39a383', 'nina')
-ON CONFLICT DO NOTHING;
-
 INSERT INTO sources (uri, author_id, dated, body) VALUES
   -- SOPs, effective 2 January 2026.
   ('doc://sop/jam-operasional#jam-praktik', 'rina', '2026-01-02T00:00:00Z',
