@@ -5,6 +5,7 @@ import { ask } from "./brain/ask";
 import { kpi } from "./brain/kpi";
 import { staffForToken } from "./brain/pairing";
 import { dueForRecall, proposeRecallMessages } from "./brain/recall";
+import { proposeStokOpname } from "./brain/stok-opname";
 
 /** Stateless MCP endpoint. The bearer token alone decides who is calling. */
 export async function handleMcp(request: Request): Promise<Response> {
@@ -56,6 +57,17 @@ export async function handleMcp(request: Request): Promise<Response> {
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true },
     },
     async ({ patients }) => toolResult(await proposeRecallMessages(caller, new Date(), patients)),
+  );
+
+  server.registerTool(
+    "propose_stok_opname",
+    {
+      description:
+        "Prepare a Stok Opname Request: a physical count of a stock card item whose Sources disagree on its stock. Only when the staff member asks for one. Never a reorder, and stock does not change: the Pemilik or a TGM accepts it on the site within 24 hours. Show `text` to the user exactly as returned.",
+      inputSchema: { item: z.string().min(1) },
+      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true },
+    },
+    async ({ item }) => toolResult(await proposeStokOpname(caller, item)),
   );
 
   // Finance tools register for the Pemilik alone; T18 pins the rest.

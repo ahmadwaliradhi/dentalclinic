@@ -1,13 +1,8 @@
 import { env } from "cloudflare:workers";
 import { expect, it } from "vitest";
 import { auditFor, verifyChain } from "../src/brain/jejak-audit";
-import {
-  decide,
-  expireProposals,
-  inbox,
-  listDueForRecall,
-  proposeRecallMessages,
-} from "../src/brain/recall";
+import { decide, expireProposals, inbox } from "../src/brain/proposals";
+import { listDueForRecall, proposeRecallMessages } from "../src/brain/recall";
 import type { Staff } from "../src/brain/staff";
 
 const rina: Staff = { id: "rina", name: "drg. Rina", role: "Pemilik" };
@@ -133,7 +128,7 @@ it("leaves no wa.me link after a decline, and logs it in the Jejak Audit (T11)",
 it("lets only drg. Rina or the patient's own Dokter Gigi Mitra decide", async () => {
   await proposeRecallMessages(rina, NOW);
   // A pending Proposal for one of drg. Andi's patients.
-  const proposal = (await pending(rina)).find((p) => p.noRm < "P-0023")!;
+  const proposal = (await pending(rina)).find((p) => p.noRm !== null && p.noRm < "P-0023")!;
 
   for (const caller of [maya, tari, nina]) {
     expect(await decide(caller, proposal.id, "accepted", NOW)).toBeNull();

@@ -1,6 +1,6 @@
 import { exports } from "cloudflare:workers";
 import { expect, it } from "vitest";
-import { inbox } from "../src/brain/recall";
+import { inbox } from "../src/brain/proposals";
 import type { Staff } from "../src/brain/staff";
 import { callTool, demoLogin, mcp, pair, SITE } from "./site";
 

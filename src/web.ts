@@ -1,7 +1,7 @@
 import { createMiddleware, createServerFn } from "@tanstack/react-start";
 import { auditFor, verifyChain } from "./brain/jejak-audit";
 import { devicesOf } from "./brain/pairing";
-import { inbox } from "./brain/recall";
+import { inbox } from "./brain/proposals";
 import { asetFor, patientsFor, scheduleFor, stockCard } from "./brain/views";
 import { signedIn } from "./session";
 
