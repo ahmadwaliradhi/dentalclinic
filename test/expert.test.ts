@@ -49,6 +49,13 @@ it("reaches the Dental Clinic Brain over MCP with a staff token typed into WorkB
   expect(JSON.stringify(plugin) + agent).not.toMatch(/demo-(rina|andi|tari|nina)/);
 });
 
+it("pairs through the same Worker that serves its MCP server", () => {
+  const origin = new URL(plugin.mcpServers["dental-clinic-brain"].url).origin;
+
+  expect(agent).toContain(`curl -s -X POST ${origin}/pairing\``);
+  expect(agent).toContain(`${origin}/pairing/token`);
+});
+
 it("answers each quick prompt from its own SOP section", async () => {
   const cited = [];
   for (const prompt of plugin.quickPrompts) {

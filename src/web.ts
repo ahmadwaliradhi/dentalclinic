@@ -1,4 +1,5 @@
 import { createMiddleware, createServerFn } from "@tanstack/react-start";
+import { devicesOf } from "./brain/pairing";
 import { asetFor, patientsFor, scheduleFor, stockCard } from "./brain/views";
 import { signedIn } from "./session";
 
@@ -23,3 +24,5 @@ export const schedule = read.handler(({ context }) => scheduleFor(context.caller
 export const stock = read.handler(() => stockCard());
 
 export const aset = read.handler(({ context }) => asetFor(context.caller));
+
+export const devices = read.handler(({ context }) => devicesOf(context.caller));

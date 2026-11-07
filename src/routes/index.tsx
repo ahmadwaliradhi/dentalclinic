@@ -90,6 +90,7 @@ const quickStart = [
   "Pasang Expert DentalClinic di WorkBuddy.",
   "Minta kode pairing 8 karakter dari Expert.",
   "Masuk di situs ini dan konfirmasi kode dalam 10 menit.",
+  "Tempel token dari Expert saat WorkBuddy meminta koneksi.",
   "Untuk ganti Role, pairing ulang lalu mulai New Task.",
 ];
 

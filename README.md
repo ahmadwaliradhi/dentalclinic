@@ -49,17 +49,23 @@ npx vitest run test/page.test.ts
 
 `ask` searches only what the caller's Role may see (`src/brain/access.ts`, applied in SQL). Restricted data and data that does not exist get the same Refusal, byte for byte; only the Jejak Audit row records the true reason (`restricted` or `not_found`). NIK and phone numbers keep their last 4 digits and email keeps its domain in everything `ask` returns. A cited Source with an expiry date, such as a SIP, adds a warning from 90 days before it ends. `test/mcp.test.ts` pins every Role's tool list.
 
-The caller comes only from the bearer token. Until Identity Pairing lands, four public demo tokens stand in for Demo Login: `demo-rina`, `demo-andi`, `demo-tari` and `demo-nina`. Only their SHA-256 hashes are stored. A missing or unknown token gets 401. Production needs `npm run db:seed -- --remote` once for the tokens to exist.
+The caller comes only from the bearer token, which Identity Pairing binds to one staff member:
+
+1. `POST /pairing` returns `code` (8 characters, valid 10 minutes), `url` (`/perangkat?kode=…`) and `secret`.
+2. The staff member opens `url`, signs in and presses **Hubungkan WorkBuddy**.
+3. `POST /pairing/token` with `{"secret": "…"}` answers `202` until then, `200` with `token` once, and `401` for an unknown, used or expired pairing.
+
+The token has scope `read propose` and expires after 90 days. Under **Perangkat terhubung** on `/perangkat` the staff member can unpair it. Tokens and secrets are stored as SHA-256 hashes only, and a missing, unknown, expired or unpaired token gets 401.
 
 ```sh
 npx @modelcontextprotocol/inspector --cli http://localhost:5173/mcp --transport http \
-  --header "Authorization: Bearer demo-nina" \
+  --header "Authorization: Bearer $TOKEN" \
   --method tools/call --tool-name ask --tool-arg "question=Jam praktik klinik?"
 ```
 
 ## WorkBuddy Expert
 
-`expert/dira-cepat/` is **Dira Cepat**, the single-agent WorkBuddy Expert. It reaches the Dental Clinic Brain only through the `dental-clinic-brain` MCP server declared in its `plugin.json`, calls `ask` once per question and shows `text` unchanged. The package holds no token: the first time Dira Cepat is used, WorkBuddy shows a connect card that asks for a staff token and fills it into `Bearer ${DENTALCLINIC_TOKEN}`.
+`expert/dira-cepat/` is **Dira Cepat**, the single-agent WorkBuddy Expert. It reaches the Dental Clinic Brain only through the `dental-clinic-brain` MCP server declared in its `plugin.json`, calls `ask` once per question and shows `text` unchanged. The package holds no token: the first time Dira Cepat is used, it runs Identity Pairing, and WorkBuddy's connect card fills the resulting token into `Bearer ${DENTALCLINIC_TOKEN}`.
 
 `npm run build` zips the package to `/dira-cepat.zip`, which the landing page links to. To build only the zip, run `npm run expert:zip`.
 
@@ -69,13 +75,13 @@ To install it into WorkBuddy on this Mac, validated and registered by WorkBuddy'
 npm run expert:install
 ```
 
-Then open Experts → My Experts → Dira Cepat, ask "Jam praktik klinik?", and enter a staff token such as `demo-nina` when WorkBuddy asks to connect `dental-clinic-brain`. When the staff member changes, start a New Task. To switch tokens, remove `dental-clinic-brain` under Connectors and connect again.
+Then open Experts → My Experts → Dira Cepat and ask "Jam praktik klinik?". Dira Cepat gives a pairing link: open it, sign in with Demo Login, press Hubungkan WorkBuddy and tell Dira Cepat it is done. Paste the token it returns when WorkBuddy asks to connect `dental-clinic-brain`. To switch staff member, remove `dental-clinic-brain` under Connectors, pair again and start a New Task.
 
 From a downloaded zip: unzip it into `~/.workbuddy-ai/plugins/marketplaces/my-experts/plugins/` and ask WorkBuddy to "validate and register the expert dira-cepat", which runs the same expert-manager scripts. To share it, use ⋯ → Share → Copy link on the Expert in WorkBuddy and put the link in `launchUrl` in `src/data/release.json`.
 
 ## Database
 
-`db/migrations/` holds the schema: staff, token hashes, patients, visits, Rencana Perawatan, fee rules, Sources (`emr://`, `doc://`, `chat://`, `task://`) with an FTS5 keyword index kept in sync by triggers, who may see each Restricted Source, and the Jejak Audit. Sources stating the same fact share a `fact` key; the engine resolves them as a Source Conflict. The seed derives one `emr://` Source per visit. `db/seed.sql` loads the fictional Klinik Gigi Senyum Sejahtera without overwriting existing rows. Both commands are safe to repeat.
+`db/migrations/` holds the schema: staff, token and pairing hashes, patients, visits, Rencana Perawatan, fee rules, Sources (`emr://`, `doc://`, `chat://`, `task://`) with an FTS5 keyword index kept in sync by triggers, who may see each Restricted Source, and the Jejak Audit. Sources stating the same fact share a `fact` key; the engine resolves them as a Source Conflict. The seed derives one `emr://` Source per visit. `db/seed.sql` loads the fictional Klinik Gigi Senyum Sejahtera without overwriting existing rows. Both commands are safe to repeat.
 
 ```sh
 npm run db:migrate -- --local

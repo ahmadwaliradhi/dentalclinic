@@ -8,15 +8,6 @@ export interface Staff {
   role: Role;
 }
 
-/** The staff member a bearer token belongs to, or null. */
-export async function staffForToken(token: string): Promise<Staff | null> {
-  return env.DB.prepare(
-    "SELECT staff.id, staff.name, staff.role FROM tokens JOIN staff ON staff.id = tokens.staff_id WHERE tokens.hash = ?",
-  )
-    .bind(await sha256(token))
-    .first<Staff>();
-}
-
 /** Seconds a web session lasts: seven days. */
 export const SESSION_SECONDS = 7 * 24 * 60 * 60;
 
@@ -51,7 +42,8 @@ export async function closeSession(secret: string): Promise<void> {
     .run();
 }
 
-async function sha256(text: string): Promise<string> {
+/** SHA-256 hex of a secret, the only form in which tokens and sessions are stored. */
+export async function sha256(text: string): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
   return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
