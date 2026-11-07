@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "dentalclinic",
+  "main": "src/server.ts",
+  "compatibility_date": "2026-11-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "assets": { "binding": "ASSETS", "directory": "dist/client" },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "dentalclinic",
+      "database_id": "39711198-aa15-41af-93e1-0def6eb3f618",
+      "migrations_dir": "db/migrations",
+    },
+  ],
+  "triggers": { "crons": ["0 17 * * *"] },
+}

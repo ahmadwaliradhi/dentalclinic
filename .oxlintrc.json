@@ -1,0 +1,11 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "react", "jsx-a11y"],
+  "ignorePatterns": [
+    "node_modules",
+    "dist",
+    "src/routeTree.gen.ts",
+    "worker-configuration.d.ts",
+    ".workbuddy-ai"
+  ]
+}
