@@ -1,4 +1,4 @@
-import { exports } from "cloudflare:workers";
+import { env, exports } from "cloudflare:workers";
 import { expect, it } from "vitest";
 import release from "../src/data/release.json";
 import testResults from "../src/data/test-results.json";
@@ -32,10 +32,10 @@ it("renders every section in the order the spec lists", async () => {
   const ids = [
     "hero",
     "demo-login",
+    "tim",
     "prinsip",
     "akuntabilitas",
     "hasil-uji",
-    "tim",
     "arsitektur",
     "video",
     "mulai",
@@ -65,7 +65,7 @@ it("shows the launch link, Expert zips and video from data", async () => {
 
 it("names the three principles and the four agents, with the team's zip", async () => {
   const { html } = await landingHtml();
-  const team = html.slice(html.indexOf('id="tim"'), html.indexOf('id="arsitektur"'));
+  const team = html.slice(html.indexOf('id="tim"'), html.indexOf('id="prinsip"'));
 
   for (const word of ["Sumber", "Izin", "Jejak"]) expect(html).toContain(word);
   for (const agent of ["Dira", "Sari", "Bima", "Wulan"]) expect(team).toContain(agent);
@@ -98,7 +98,7 @@ it("states the accountability sheet from the spec", async () => {
 
 it("renders one test results row per data entry, failures included", async () => {
   const { html } = await landingHtml();
-  const table = html.slice(html.indexOf('id="hasil-uji"'), html.indexOf('id="tim"'));
+  const table = html.slice(html.indexOf('id="hasil-uji"'), html.indexOf('id="arsitektur"'));
   const rows = table.match(/<tr data-test-id="[^"]+"/g) ?? [];
 
   expect(rows).toHaveLength(testResults.length);
@@ -113,7 +113,8 @@ it("renders one test results row per data entry, failures included", async () =>
 it("gives every image alt text and every frame a title", async () => {
   const { html } = await landingHtml();
 
-  for (const tag of html.match(/<img\b[^>]*>/g) ?? []) expect(tag).toMatch(/alt="[^"]+"/);
+  // alt="" marks a decorative image, such as a logo next to its name.
+  for (const tag of html.match(/<img\b[^>]*>/g) ?? []) expect(tag).toMatch(/alt="[^"]*"/);
   for (const tag of html.match(/<iframe\b[^>]*>/g) ?? []) expect(tag).toMatch(/title="[^"]+"/);
   expect(html).toMatch(/<img\b[^>]*src="\/arsitektur\.svg"/);
 });
@@ -122,4 +123,62 @@ it("has no pricing, testimonials or client logos", async () => {
   const { html } = await landingHtml();
 
   expect(html).not.toMatch(/harga|testimoni|klien kami|\/bulan/i);
+});
+
+it("shows the tooth favicon in the browser tab", async () => {
+  const { html } = await landingHtml();
+
+  expect(html).toMatch(
+    /<link (?=[^>]*rel="icon")(?=[^>]*type="image\/svg\+xml")[^>]*href="\/favicon\.svg"/,
+  );
+  const icon = await env.ASSETS.fetch("https://dentalclinic.test/favicon.svg");
+  expect(icon.status).toBe(200);
+  expect(icon.headers.get("content-type")).toContain("image/svg+xml");
+  for (const png of ["/favicon.png", "/apple-touch-icon.png"]) {
+    expect(html).toContain(`href="${png}"`);
+    expect((await env.ASSETS.fetch(`https://dentalclinic.test${png}`)).status).toBe(200);
+  }
+});
+
+it("walks a newcomer from Buka di WorkBuddy to the Refusal-then-answer check", async () => {
+  const { html } = await landingHtml();
+  const steps = html.slice(html.indexOf('id="mulai"'), html.indexOf('id="faq"'));
+
+  expect(steps).toContain("Buka di WorkBuddy");
+  expect(steps).toContain("DentalClinic Team");
+  expect(steps).toContain("Hubungkan WorkBuddy");
+  expect(steps).toContain("dental-clinic-brain");
+  expect(steps).toContain("New Task");
+  // Same question twice: Refusal as Nina, then the cited answer as drg. Rina.
+  const order = [
+    "Buka di WorkBuddy",
+    "Nina",
+    "P-0007",
+    "Connectors",
+    "sebagai drg. Rina",
+    "emr://",
+  ];
+  const positions = order.map((text) => steps.indexOf(text));
+  expect(positions.every((position) => position > -1)).toBe(true);
+  expect(positions).toEqual([...positions].sort((a, b) => a - b));
+});
+
+it("heads the page with both logos and links to the tests, the video and WorkBuddy", async () => {
+  const { html } = await landingHtml();
+  const header = html.slice(html.indexOf('id="site-header"'), html.indexOf('id="hero"'));
+
+  // Logos sit beside their names, so they are decorative.
+  expect(header).toMatch(/<img\b[^>]*src="\/favicon\.svg"[^>]*alt=""/);
+  expect(header).toMatch(/<img\b[^>]*src="\/workbuddy\.png"[^>]*alt=""/);
+  expect(header).toContain("Dental Clinic");
+  expect(header).toContain("WorkBuddy AI");
+  expect(header).toMatch(/<a\b[^>]*href="#hasil-uji"[^>]*>Hasil Uji Agents</);
+  expect(header).toMatch(/<a\b[^>]*href="#video"[^>]*>Cek Video Demo</);
+  if (release.launchUrl) {
+    expect(header).toContain(`href="${escapeHtml(release.launchUrl)}"`);
+    expect(header).toContain(">Buka di WorkBuddy<");
+  }
+  expect(html).not.toContain("Masuk sebagai staf");
+  const logo = await env.ASSETS.fetch("https://dentalclinic.test/workbuddy.png");
+  expect(logo.status).toBe(200);
 });

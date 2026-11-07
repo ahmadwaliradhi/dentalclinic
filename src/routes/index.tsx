@@ -95,8 +95,8 @@ const accountability = [
 
 const install: Step = release.launchUrl
   ? {
-      title: "Tambahkan Expert ke WorkBuddy.",
-      body: "Klik Buka di WorkBuddy di bagian atas halaman.",
+      title: "Klik Buka di WorkBuddy.",
+      body: "Tombolnya di bagian atas halaman. Belum punya WorkBuddy? Pasang dan masuk dulu, lalu klik lagi. WorkBuddy menambahkan Expert Dental Clinic Brain dan DentalClinic Team.",
     }
   : {
       title: "Tambahkan Expert ke WorkBuddy.",
@@ -111,23 +111,33 @@ const install: Step = release.launchUrl
       ),
     };
 
+// The path the WorkBuddy test run took: pair as Nina, see the Refusal,
+// switch to drg. Rina, see the answer.
 const quickStart: Step[] = [
   install,
   {
     title: "Ajukan pertanyaan pertama.",
-    body: "Buka Experts → My Experts, pilih Dira Cepat, lalu tanya apa saja, misalnya “Jam praktik klinik?”. Dira membalas dengan tautan dan kode 8 karakter.",
+    body: "Klik New Task. Di kotak chat, pilih Dental Clinic Brain, lalu ketik “Jam praktik klinik?”. Karena ini pertama kali, Dira membalas dengan tautan dan kode 8 karakter.",
   },
   {
-    title: "Hubungkan akun Anda dalam 10 menit.",
-    body: "Buka tautan dari Dira, pilih nama Anda di Coba sebagai, tekan Hubungkan WorkBuddy, lalu balas “sudah” ke Dira.",
+    title: "Masuk sebagai Nina, Front Office.",
+    body: "Buka tautan dari Dira. Di Coba sebagai, pilih Nina, lalu tekan Hubungkan WorkBuddy. Lakukan dalam 10 menit, lalu balas “sudah” ke Dira.",
   },
   {
     title: "Tempel token.",
-    body: "Dira memberi token. Saat WorkBuddy meminta koneksi dental-clinic-brain, tempel token itu. Token hanya muncul sekali.",
+    body: "Dira memberi token. Saat WorkBuddy meminta koneksi dental-clinic-brain, tempel token itu lalu simpan. Token hanya muncul sekali.",
   },
   {
-    title: "Ganti staf.",
-    body: "Hapus dental-clinic-brain di Connectors, ulangi dari langkah 2 sebagai staf lain, lalu mulai New Task.",
+    title: "Uji batas izin.",
+    body: "Tanya “Apa diagnosis pasien P-0007?”. Dira menolak dengan jawaban yang sama seperti untuk pasien yang tidak ada, lalu menyebut drg. Rina.",
+  },
+  {
+    title: "Ganti ke drg. Rina.",
+    body: "Di menu kiri, buka Connectors dan hapus dental-clinic-brain. Klik New Task, ulangi langkah 2 sampai 4 sebagai drg. Rina, lalu tanya lagi soal P-0007. Kali ini Dira menjawab dengan sumber emr://.",
+  },
+  {
+    title: "Coba DentalClinic Team.",
+    body: "Klik New Task, pilih DentalClinic Team, lalu tanya “Siapa yang belum selesai PSA bulan lalu? Buatkan pengingat.”",
   },
 ];
 
@@ -161,14 +171,17 @@ const faq = [
 function Landing() {
   return (
     <div className="mx-auto max-w-3xl px-4 sm:px-6">
-      <div className="flex items-center justify-between py-5 font-semibold">
-        <span>Dental Clinic Brain</span>
-        <a href="#demo-login" className="text-sm font-medium text-primary">
-          Masuk sebagai staf
-        </a>
-      </div>
+      <SiteHeader />
       <main>
         <Hero />
+        <Section id="tim" title="Tim">
+          <Terms terms={team} className="grid-cols-2 sm:grid-cols-4" />
+          {release.teamZipUrl && (
+            <Button asChild variant="outline" className="mt-8">
+              <a href={release.teamZipUrl}>Unduh Tim</a>
+            </Button>
+          )}
+        </Section>
         <Section id="prinsip" title="Setiap jawaban">
           <Terms terms={principles} className="sm:grid-cols-3" />
         </Section>
@@ -188,14 +201,6 @@ function Landing() {
         </Section>
         <Section id="hasil-uji" title="Hasil uji di WorkBuddy">
           <TestResults />
-        </Section>
-        <Section id="tim" title="Tim">
-          <Terms terms={team} className="grid-cols-2 sm:grid-cols-4" />
-          {release.teamZipUrl && (
-            <Button asChild variant="outline" className="mt-8">
-              <a href={release.teamZipUrl}>Unduh Tim</a>
-            </Button>
-          )}
         </Section>
         <Section id="arsitektur" title="Arsitektur">
           <img
@@ -251,6 +256,38 @@ function Landing() {
         </a>
       </footer>
     </div>
+  );
+}
+
+function SiteHeader() {
+  return (
+    <header
+      id="site-header"
+      className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 py-5"
+    >
+      <span className="flex items-center gap-2 font-semibold">
+        <img src="/favicon.svg" alt="" width={24} height={24} className="size-6" />
+        <span>Dental Clinic</span>
+        <span aria-hidden="true" className="text-muted-foreground">
+          ×
+        </span>
+        <img src="/workbuddy.png" alt="" width={24} height={24} className="size-6 rounded-md" />
+        <span>WorkBuddy AI</span>
+      </span>
+      <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium">
+        <a href="#hasil-uji" className="hover:text-primary">
+          Hasil Uji Agents
+        </a>
+        <a href="#video" className="hover:text-primary">
+          Cek Video Demo
+        </a>
+        {release.launchUrl && (
+          <Button asChild size="sm">
+            <a href={release.launchUrl}>Buka di WorkBuddy</a>
+          </Button>
+        )}
+      </nav>
+    </header>
   );
 }
 
