@@ -16,6 +16,11 @@ interface Term {
   body: string;
 }
 
+interface Step {
+  title: string;
+  body: ReactNode;
+}
+
 type TestStatus = "lulus" | "gagal" | "belum";
 
 interface TestResult {
@@ -88,12 +93,42 @@ const accountability = [
   },
 ];
 
-const quickStart = [
-  "Pasang Expert DentalClinic di WorkBuddy.",
-  "Minta kode pairing 8 karakter dari Expert.",
-  "Masuk di situs ini dan konfirmasi kode dalam 10 menit.",
-  "Tempel token dari Expert saat WorkBuddy meminta koneksi.",
-  "Untuk ganti Role, pairing ulang lalu mulai New Task.",
+const install: Step = release.launchUrl
+  ? {
+      title: "Tambahkan Expert ke WorkBuddy.",
+      body: "Klik Buka di WorkBuddy di bagian atas halaman.",
+    }
+  : {
+      title: "Tambahkan Expert ke WorkBuddy.",
+      body: (
+        <>
+          Klik Unduh Expert di bagian atas halaman, lalu klik dua kali file zip-nya. Pindahkan
+          folder <code>dira-cepat</code> ke{" "}
+          <code>~/.workbuddy-ai/plugins/marketplaces/my-experts/plugins/</code> (di Finder, tekan
+          Cmd+Shift+G lalu tempel alamat itu). Di WorkBuddy, ketik{" "}
+          <code>validate and register the expert dira-cepat</code>.
+        </>
+      ),
+    };
+
+const quickStart: Step[] = [
+  install,
+  {
+    title: "Ajukan pertanyaan pertama.",
+    body: "Buka Experts → My Experts, pilih Dira Cepat, lalu tanya apa saja, misalnya “Jam praktik klinik?”. Dira membalas dengan tautan dan kode 8 karakter.",
+  },
+  {
+    title: "Hubungkan akun Anda dalam 10 menit.",
+    body: "Buka tautan dari Dira, pilih nama Anda di Coba sebagai, tekan Hubungkan WorkBuddy, lalu balas “sudah” ke Dira.",
+  },
+  {
+    title: "Tempel token.",
+    body: "Dira memberi token. Saat WorkBuddy meminta koneksi dental-clinic-brain, tempel token itu. Token hanya muncul sekali.",
+  },
+  {
+    title: "Ganti staf.",
+    body: "Hapus dental-clinic-brain di Connectors, ulangi dari langkah 2 sebagai staf lain, lalu mulai New Task.",
+  },
 ];
 
 const faq = [
@@ -187,9 +222,14 @@ function Landing() {
           )}
         </Section>
         <Section id="mulai" title="Mulai">
-          <ol className="list-decimal space-y-2 pl-5">
+          <ol className="list-decimal space-y-4 pl-5">
             {quickStart.map((step) => (
-              <li key={step}>{step}</li>
+              <li key={step.title}>
+                <span className="font-medium">{step.title}</span>
+                <p className="mt-1 text-muted-foreground [&_code]:text-sm [&_code]:break-all">
+                  {step.body}
+                </p>
+              </li>
             ))}
           </ol>
         </Section>
