@@ -1,0 +1,55 @@
+{
+  "name": "dira-cepat",
+  "version": "1.0.0",
+  "description": "Answers Klinik Gigi Senyum Sejahtera staff from the Dental Clinic Brain over MCP, with sources.",
+  "author": { "name": "Ahmad Wali Radhi" },
+  "homepage": "https://dentalclinic.ahmadwaliradhi.workers.dev",
+  "license": "MIT",
+  "agents": ["./agents/dira-cepat.md"],
+  "expertType": "agent",
+  "agentName": "dira-cepat",
+  "displayName": { "en": "Dira Cepat", "zh": "Dira Cepat" },
+  "profession": { "en": "Dental Clinic Brain", "zh": "牙科诊所大脑" },
+  "displayDescription": {
+    "en": "Answers staff questions about clinic SOPs, schedules and daily work word for word from the Dental Clinic Brain, with a source for every answer and a Jejak Audit row for every question.",
+    "zh": "为诊所员工解答规程、排班与日常问题，答案逐字取自诊所知识库，附带出处，每次提问都留有审计记录。"
+  },
+  "avatar": "avatars/expert.png",
+  "categoryId": "12-IndustryConsultant",
+  "defaultInitPrompt": { "en": "Jam praktik klinik?", "zh": "Jam praktik klinik?" },
+  "plugin": "dira-cepat",
+  "tags": [
+    { "en": "Clinic SOPs", "zh": "诊所规程" },
+    { "en": "Cited answers", "zh": "引用出处" },
+    { "en": "Jejak Audit", "zh": "审计记录" }
+  ],
+  "quickPrompts": [
+    { "en": "Jam praktik klinik?", "zh": "Jam praktik klinik?" },
+    { "en": "Bagaimana instrumen disterilkan?", "zh": "Bagaimana instrumen disterilkan?" },
+    { "en": "Bagaimana membuat janji temu?", "zh": "Bagaimana membuat janji temu?" }
+  ],
+  "mcpServers": {
+    "dental-clinic-brain": {
+      "type": "http",
+      "url": "https://dentalclinic.ahmadwaliradhi.workers.dev/mcp",
+      "headers": { "Authorization": "Bearer ${DENTALCLINIC_TOKEN}" },
+      "x-workbuddy": {
+        "displayName": "Dental Clinic Brain",
+        "auth": {
+          "type": "token",
+          "tokenSchema": {
+            "title": "Dental Clinic Brain",
+            "fields": [
+              {
+                "key": "DENTALCLINIC_TOKEN",
+                "label": { "en": "Staff token", "zh": "员工令牌" },
+                "type": "password",
+                "required": true
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
