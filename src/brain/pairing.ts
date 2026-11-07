@@ -1,5 +1,5 @@
 import { env } from "cloudflare:workers";
-import { sha256 } from "./staff";
+import { sha256 } from "./sha256";
 import type { Staff } from "./staff";
 
 // Identity Pairing: WorkBuddy asks for a code, the signed-in staff member confirms it on the site,

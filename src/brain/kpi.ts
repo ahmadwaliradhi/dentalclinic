@@ -1,4 +1,5 @@
 import { env } from "cloudflare:workers";
+import { visibleTo } from "./access";
 import { ask } from "./ask";
 import type { Answer, Citation, Reason } from "./ask";
 import { recordAsk } from "./jejak-audit";
@@ -49,6 +50,7 @@ export async function kpi(caller: Staff, query: string): Promise<Answer> {
   const { citations } = answer;
   const auditId = await recordAsk({
     caller,
+    filter: visibleTo(caller),
     question: query,
     retrieved: citations,
     answer,

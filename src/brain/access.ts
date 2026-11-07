@@ -60,3 +60,8 @@ export function patientsVisibleTo(caller: Staff): Guard {
 export function seesClinicFinance(caller: Staff): boolean {
   return caller.role === "Pemilik";
 }
+
+/** The whole Jejak Audit, with Refusal reasons and injection flags, is the Pemilik's alone. */
+export function seesWholeJejakAudit(caller: Staff): boolean {
+  return caller.role === "Pemilik";
+}
