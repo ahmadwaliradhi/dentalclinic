@@ -108,6 +108,10 @@ _Avoid_: reference, document (for all types), evidence
 Two Sources that disagree on the same fact; the higher-authority one wins (emr, then doc, then task, then Pemilik chat, then staff chat), except that a newer Pemilik chat overrides an older doc.
 _Avoid_: inconsistency, discrepancy
 
+**Injection Flag**:
+A sentence in a retrieved Source that reads as an instruction to the Klinik Brain; it is reported and logged in the Jejak Audit, never cited or followed.
+_Avoid_: alert, warning, prompt injection (in UI copy)
+
 **Topic Owner**:
 The person the Klinik Brain names when it cannot answer a question in a given area.
 _Avoid_: contact person, escalation, PIC
@@ -117,5 +121,5 @@ The append-only record of every question, the Sources retrieved, the answer or R
 _Avoid_: log, history, activity feed
 
 **Refusal**:
-The single fixed reply given both for Restricted data and for data that does not exist, so the asker cannot tell which.
+The single fixed reply given both for Restricted data and for data that does not exist, so the asker cannot tell which; also given to requests for the Klinik Brain's own instructions.
 _Avoid_: error, access denied, not found

@@ -44,7 +44,7 @@ npx vitest run test/page.test.ts
 `POST /mcp` is a stateless Streamable HTTP MCP server with two tools:
 
 - `who_am_i` returns the staff member and Role behind the bearer token.
-- `ask` returns the answer envelope: `text` (final, cited, shown verbatim), `decision`, `citations` (URI, date, quoted text) and `auditId`. Every call writes one Jejak Audit row.
+- `ask` returns the answer envelope: `text` (final, cited, shown verbatim), `decision` (`answered`, `unknown_routed` or `refusal`), `citations` (URI, date, quoted text), `flags` (instruction-like sentences found in retrieved Sources and not followed) and `auditId`. Every call writes one Jejak Audit row.
 
 `ask` searches only what the caller's Role may see (`src/brain/access.ts`, applied in SQL). Restricted data and data that does not exist get the same Refusal, byte for byte; only the Jejak Audit row records the true reason (`restricted` or `not_found`). NIK and phone numbers keep their last 4 digits and email keeps its domain in everything `ask` returns. There are no finance tools yet; `test/mcp.test.ts` pins the TGM and Front Office tool lists so one cannot appear for them.
 
@@ -74,7 +74,7 @@ From a downloaded zip: unzip it into `~/.workbuddy-ai/plugins/marketplaces/my-ex
 
 ## Database
 
-`db/migrations/` holds the schema: staff, token hashes, patients, visits, Rencana Perawatan, fee rules, Sources (`emr://`, `doc://`, `chat://`, `task://`) with an FTS5 keyword index kept in sync by triggers, who may see each Restricted Source, and the Jejak Audit. The seed derives one `emr://` Source per visit. `db/seed.sql` loads the fictional Klinik Gigi Senyum Sejahtera without overwriting existing rows. Both commands are safe to repeat.
+`db/migrations/` holds the schema: staff, token hashes, patients, visits, Rencana Perawatan, fee rules, Sources (`emr://`, `doc://`, `chat://`, `task://`) with an FTS5 keyword index kept in sync by triggers, who may see each Restricted Source, and the Jejak Audit. Sources stating the same fact share a `fact` key; the engine resolves them as a Source Conflict. The seed derives one `emr://` Source per visit. `db/seed.sql` loads the fictional Klinik Gigi Senyum Sejahtera without overwriting existing rows. Both commands are safe to repeat.
 
 ```sh
 npm run db:migrate -- --local

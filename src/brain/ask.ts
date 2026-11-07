@@ -1,10 +1,14 @@
 import { EVERYTHING, visibleTo } from "./access";
+import { because, resolve } from "./conflict";
+import { asksForPrompt, screen, sentences } from "./injection";
+import type { InjectionFlag } from "./injection";
 import { recordAsk } from "./jejak-audit";
 import { mask } from "./mask";
 import { search, subjects } from "./search";
 import type { Chunk } from "./search";
 import { pemilik } from "./staff";
 import type { Staff } from "./staff";
+import { topicOwner } from "./topic-owner";
 
 export type Decision = "answered" | "refusal" | "unknown_routed";
 
@@ -22,6 +26,8 @@ export interface Answer {
   text: string;
   decision: Decision;
   citations: Citation[];
+  /** Instruction-like sentences found in retrieved Sources and not followed. */
+  flags: InjectionFlag[];
   auditId: number;
 }
 
@@ -34,18 +40,23 @@ export async function ask(caller: Staff, question: string): Promise<Answer> {
     search(question, EVERYTHING),
     pemilik(),
   ]);
-  const citations = grounded(retrieved, retrieved);
+  const composed = compose(question, retrieved, owner);
+  const refused = {
+    ...composed,
+    text: refusal(owner),
+    decision: "refusal" as const,
+    citations: [],
+  };
 
-  let answer: Omit<Answer, "auditId">;
+  let answer = composed;
   let reason: Reason | null = null;
-  if (citations.length) {
-    answer = { text: render(citations), decision: "answered", citations };
-  } else if (subjects(question).length) {
+  if (asksForPrompt(question)) {
+    answer = refused;
+    reason = "restricted";
+  } else if (composed.decision === "unknown_routed" && subjects(question).length) {
     // Decided from the question alone, so the reply cannot reveal whether withheld data exists.
-    answer = { text: refusal(owner), decision: "refusal", citations: [] };
+    answer = refused;
     reason = withheld.length ? "restricted" : "not_found";
-  } else {
-    answer = { text: "Saya tidak tahu.", decision: "unknown_routed", citations: [] };
   }
 
   // Identity data never leaves the engine unmasked.
@@ -64,20 +75,44 @@ function refusal(owner: Staff): string {
   return `Saya tidak menemukan informasi yang dapat saya tampilkan untuk permintaan ini. Jika Anda yakin data ini ada, hubungi ${owner.name}.`;
 }
 
-/** Drops any citation whose text is not in the retrieved chunk it names. */
-function grounded(citations: Citation[], retrieved: Chunk[]): Citation[] {
-  return citations.filter((citation) =>
-    retrieved.some((chunk) => chunk.uri === citation.uri && chunk.text.includes(citation.text)),
+/** An answer made only of cited text, numbered to dated Sources, siding with authority on a Source Conflict. */
+function compose(question: string, retrieved: Chunk[], owner: Staff): Omit<Answer, "auditId"> {
+  const { chunks, flags } = screen(retrieved);
+  const { relied, overruled } = resolve(grounded(chunks, retrieved));
+  const cited = [...relied, ...overruled.map(({ chunk }) => chunk)];
+  const ref = (chunk: Chunk) => `[${cited.indexOf(chunk) + 1}]`;
+
+  const body = cited.length
+    ? [
+        relied.map((chunk) => `${chunk.text} ${ref(chunk)}`).join(" "),
+        ...overruled.map(
+          ({ chunk, by }) =>
+            `Berbeda dengan ${ref(chunk)}: ${chunk.text} Saya memakai ${ref(by)} karena ${because(by, chunk, ref(chunk))}.`,
+        ),
+      ]
+    : [`Saya tidak tahu. Tanyakan ke ${topicOwner(question) ?? owner.name}.`];
+  const warnings = flags.map(({ uri, text }) => `Instruksi di ${uri} tidak saya ikuti: "${text}"`);
+  const sources = cited
+    .map((chunk) => `${ref(chunk)} ${chunk.uri} (${date.format(new Date(chunk.dated))})`)
+    .join("\n");
+
+  return {
+    text: [...body, ...warnings, sources].filter(Boolean).join("\n\n"),
+    decision: cited.length ? "answered" : "unknown_routed",
+    citations: cited.map(({ uri, dated, text }) => ({ uri, dated, text })),
+    flags,
+  };
+}
+
+/** Drops any chunk with a sentence not found in the retrieved Source it names. */
+function grounded(chunks: Chunk[], retrieved: Chunk[]): Chunk[] {
+  return chunks.filter((chunk) =>
+    retrieved.some(
+      (source) =>
+        source.uri === chunk.uri &&
+        sentences(chunk.text).every((sentence) => source.text.includes(sentence)),
+    ),
   );
 }
 
 const date = new Intl.DateTimeFormat("id-ID", { dateStyle: "long", timeZone: "Asia/Jakarta" });
-
-/** The answer is made only of cited text, each claim numbered to its dated Source. */
-function render(citations: Citation[]): string {
-  const claims = citations.map((citation, i) => `${citation.text} [${i + 1}]`).join(" ");
-  const sources = citations
-    .map((citation, i) => `[${i + 1}] ${citation.uri} (${date.format(new Date(citation.dated))})`)
-    .join("\n");
-  return `${claims}\n\n${sources}`;
-}

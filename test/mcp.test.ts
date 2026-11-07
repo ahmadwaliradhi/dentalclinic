@@ -54,6 +54,7 @@ it("ask over MCP returns the engine's answer envelope for the token's staff memb
         text: JAM_PRAKTIK,
       },
     ],
+    flags: [],
     auditId: expect.any(Number),
   });
   expect(

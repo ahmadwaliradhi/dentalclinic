@@ -11,6 +11,7 @@ const REFUSAL = {
   text: "Saya tidak menemukan informasi yang dapat saya tampilkan untuk permintaan ini. Jika Anda yakin data ini ada, hubungi drg. Rina.",
   decision: "refusal",
   citations: [],
+  flags: [],
 };
 
 it("refuses Nina the diagnosis of a seeded patient (T02)", async () => {
