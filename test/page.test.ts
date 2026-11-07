@@ -74,6 +74,9 @@ it("offers Demo Login as each of the four seeded staff members", async () => {
   const { html } = await landingHtml();
 
   for (const name of ["drg. Rina", "drg. Andi", "Tari", "Nina"]) expect(html).toContain(name);
+  for (const id of ["rina", "andi", "tari", "nina"]) {
+    expect(html).toMatch(new RegExp(`<form (?=[^>]*method="post")[^>]*action="/demo/${id}"`));
+  }
 });
 
 it("states the accountability sheet from the spec", async () => {

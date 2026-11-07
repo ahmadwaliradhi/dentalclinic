@@ -27,3 +27,36 @@ export function visibleTo(caller: Staff): Guard {
       return { sql: "sources.area IS NULL", params: [] };
   }
 }
+
+/** Visits whose emr Source the caller may see, as an SQL condition on `visits`. */
+export function visitsVisibleTo(caller: Staff): Guard {
+  const sources = visibleTo(caller);
+  return {
+    sql: `EXISTS (SELECT 1 FROM sources WHERE sources.uri = 'emr://patient/' || visits.patient_no || '/visit/' || visits.n AND (${sources.sql}))`,
+    params: sources.params,
+  };
+}
+
+/**
+ * Patients the caller may list, as an SQL condition on `patients`: every patient for the Pemilik
+ * and Front Office, a Dokter Gigi Mitra's own, and those a TGM assisted.
+ */
+export function patientsVisibleTo(caller: Staff): Guard {
+  switch (caller.role) {
+    case "Pemilik":
+    case "Front Office":
+      return EVERYTHING;
+    case "Dokter Gigi Mitra":
+      return { sql: "patients.dentist_id = ?", params: [caller.id] };
+    case "TGM":
+      return {
+        sql: "patients.no_rm IN (SELECT patient_no FROM visits WHERE assistant_id = ?)",
+        params: [caller.id],
+      };
+  }
+}
+
+/** Clinic finance, such as what an Aset cost, is the Pemilik's alone. */
+export function seesClinicFinance(caller: Staff): boolean {
+  return caller.role === "Pemilik";
+}
