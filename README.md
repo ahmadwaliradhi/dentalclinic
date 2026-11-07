@@ -1,8 +1,8 @@
-# DentalClinic Brain
+# Dental Clinic Brain
 
 Live: [dentalclinic.ahmadwaliradhi.workers.dev](https://dentalclinic.ahmadwaliradhi.workers.dev)
 
-One TanStack Start application on one Cloudflare Worker, with D1. The site is Indonesian; staff talk to the Klinik Brain only through WorkBuddy, over MCP at `/mcp`. Domain vocabulary lives in [GLOSSARY.md](GLOSSARY.md), architecture in [docs/adr](docs/adr/).
+One TanStack Start application on one Cloudflare Worker, with D1. The site is Indonesian; staff talk to Dental Clinic Brain only through WorkBuddy, over MCP at `/mcp`. Domain vocabulary lives in [GLOSSARY.md](GLOSSARY.md), architecture in [docs/adr](docs/adr/).
 
 ## Run
 

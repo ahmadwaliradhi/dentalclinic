@@ -29,7 +29,7 @@ function Klinik() {
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6">
       <header className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b py-3 text-sm">
-        <nav className="flex gap-1">
+        <nav className="flex flex-wrap gap-0.5">
           {views
             // Only a Role that makes Approval Decisions gets the inbox.
             .filter((view) => view.to !== "/persetujuan" || decidesProposals(staff))
@@ -38,15 +38,16 @@ function Klinik() {
                 key={view.to}
                 to={view.to}
                 className="rounded-md px-2.5 py-1.5 text-muted-foreground hover:text-foreground"
-                activeProps={{ className: "bg-secondary text-foreground" }}
+                activeProps={{ className: "bg-secondary text-secondary-foreground" }}
               >
                 {view.label}
               </Link>
             ))}
         </nav>
         <form method="post" action="/keluar" className="ml-auto flex items-center gap-3">
-          <span>
-            {staff.name} <span className="text-muted-foreground">{staff.role}</span>
+          <span className="text-right leading-tight">
+            {staff.name}
+            <span className="block text-muted-foreground">{staff.role}</span>
           </span>
           <Button type="submit" variant="ghost" size="sm">
             Keluar

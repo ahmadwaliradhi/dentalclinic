@@ -16,14 +16,14 @@ function escapeHtml(text: string) {
     .replaceAll('"', "&quot;");
 }
 
-it("serves the Indonesian DentalClinic Brain landing page from the Worker", async () => {
+it("serves the Indonesian Dental Clinic Brain landing page from the Worker", async () => {
   const { response, html } = await landingHtml();
 
   expect(response.status).toBe(200);
   expect(response.headers.get("content-type")).toContain("text/html");
   expect(html).toContain('<html lang="id">');
-  expect(html).toContain("<title>DentalClinic Brain</title>");
-  expect(html).toMatch(/<h1[^>]*>[^<]*DentalClinic Brain/);
+  expect(html).toContain("<title>Dental Clinic Brain</title>");
+  expect(html).toMatch(/<h1[^>]*>[^<]*menyebut sumbernya/);
   expect(html).toContain("/assets/");
 });
 
@@ -31,11 +31,11 @@ it("renders every section in the order the spec lists", async () => {
   const { html } = await landingHtml();
   const ids = [
     "hero",
-    "prinsip",
-    "tim",
     "demo-login",
+    "prinsip",
     "akuntabilitas",
     "hasil-uji",
+    "tim",
     "arsitektur",
     "video",
     "mulai",
@@ -65,7 +65,7 @@ it("shows the launch link, Expert zips and video from data", async () => {
 
 it("names the three principles and the four agents, with the team's zip", async () => {
   const { html } = await landingHtml();
-  const team = html.slice(html.indexOf('id="tim"'), html.indexOf('id="demo-login"'));
+  const team = html.slice(html.indexOf('id="tim"'), html.indexOf('id="arsitektur"'));
 
   for (const word of ["Sumber", "Izin", "Jejak"]) expect(html).toContain(word);
   for (const agent of ["Dira", "Sari", "Bima", "Wulan"]) expect(team).toContain(agent);
@@ -98,7 +98,7 @@ it("states the accountability sheet from the spec", async () => {
 
 it("renders one test results row per data entry, failures included", async () => {
   const { html } = await landingHtml();
-  const table = html.slice(html.indexOf('id="hasil-uji"'), html.indexOf('id="arsitektur"'));
+  const table = html.slice(html.indexOf('id="hasil-uji"'), html.indexOf('id="tim"'));
   const rows = table.match(/<tr data-test-id="[^"]+"/g) ?? [];
 
   expect(rows).toHaveLength(testResults.length);
