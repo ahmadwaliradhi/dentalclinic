@@ -62,7 +62,7 @@ Research matrix T01–T25 with two edits: T25 becomes "SIP drg. Andi habis kapan
 
 ## Site
 
-Sections: hero with launch link and zip; three principles (sumber, izin, jejak); meet the team; Demo Login strip; accountability sheet; test results including failures; architecture image; embedded video; pairing quick start; FAQ; footer. No pricing, testimonials or client logos.
+Sections: hero with launch link and zip; Demo Login strip; meet the team; three principles (sumber, izin, jejak); accountability sheet; test results including failures; architecture image; embedded video; pairing quick start; FAQ; footer. No pricing, testimonials or client logos.
 
 ## Process
 

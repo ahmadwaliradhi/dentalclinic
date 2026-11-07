@@ -133,6 +133,10 @@ it("shows the tooth favicon in the browser tab", async () => {
   const icon = await env.ASSETS.fetch("https://dentalclinic.test/favicon.svg");
   expect(icon.status).toBe(200);
   expect(icon.headers.get("content-type")).toContain("image/svg+xml");
+  for (const png of ["/favicon.png", "/apple-touch-icon.png"]) {
+    expect(html).toContain(`href="${png}"`);
+    expect((await env.ASSETS.fetch(`https://dentalclinic.test${png}`)).status).toBe(200);
+  }
 });
 
 it("walks a newcomer from Buka di WorkBuddy to the Refusal-then-answer check", async () => {
@@ -143,10 +147,17 @@ it("walks a newcomer from Buka di WorkBuddy to the Refusal-then-answer check", a
   expect(steps).toContain("DentalClinic Team");
   expect(steps).toContain("Hubungkan WorkBuddy");
   expect(steps).toContain("dental-clinic-brain");
-  // The issue #5 check: same question, Refusal as Nina, answer as drg. Rina.
-  expect(steps).toContain("P-0007");
-  expect(steps).toContain("Nina");
-  expect(steps).toContain("drg. Rina");
-  expect(steps).toContain("Connectors");
   expect(steps).toContain("New Task");
+  // Same question twice: Refusal as Nina, then the cited answer as drg. Rina.
+  const order = [
+    "Buka di WorkBuddy",
+    "Nina",
+    "P-0007",
+    "Connectors",
+    "sebagai drg. Rina",
+    "emr://",
+  ];
+  const positions = order.map((text) => steps.indexOf(text));
+  expect(positions.every((position) => position > -1)).toBe(true);
+  expect(positions).toEqual([...positions].sort((a, b) => a - b));
 });

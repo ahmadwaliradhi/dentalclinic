@@ -96,7 +96,7 @@ const accountability = [
 const install: Step = release.launchUrl
   ? {
       title: "Klik Buka di WorkBuddy.",
-      body: "Tombolnya ada di bagian atas halaman ini. Jika WorkBuddy belum terpasang, pasang dan masuk dulu, lalu klik tombol itu lagi. WorkBuddy menambahkan dua Expert: Dental Clinic Brain untuk pertanyaan sehari-hari dan DentalClinic Team untuk permintaan yang lebih rumit.",
+      body: "Tombolnya di bagian atas halaman. Belum punya WorkBuddy? Pasang dan masuk dulu, lalu klik lagi. WorkBuddy menambahkan Expert Dental Clinic Brain dan DentalClinic Team.",
     }
   : {
       title: "Tambahkan Expert ke WorkBuddy.",
@@ -111,8 +111,8 @@ const install: Step = release.launchUrl
       ),
     };
 
-// The same path the WorkBuddy test run took: pair as Nina, see the Refusal,
-// switch to drg. Rina, see the answer (T02 and T06).
+// The path the WorkBuddy test run took: pair as Nina, see the Refusal,
+// switch to drg. Rina, see the answer.
 const quickStart: Step[] = [
   install,
   {
@@ -125,19 +125,19 @@ const quickStart: Step[] = [
   },
   {
     title: "Tempel token.",
-    body: "Dira memberi token. Saat WorkBuddy meminta koneksi dental-clinic-brain, tempel token itu lalu simpan. Token hanya muncul sekali. Setelah terhubung, Dira menjawab dengan sumbernya.",
+    body: "Dira memberi token. Saat WorkBuddy meminta koneksi dental-clinic-brain, tempel token itu lalu simpan. Token hanya muncul sekali.",
   },
   {
     title: "Uji batas izin.",
-    body: "Tanya “Apa diagnosis pasien P-0007?”. Nina tidak boleh melihat rekam medis, jadi Dira menolak dan menyebut drg. Rina.",
+    body: "Tanya “Apa diagnosis pasien P-0007?”. Dira menolak dengan jawaban yang sama seperti untuk pasien yang tidak ada, lalu menyebut drg. Rina.",
   },
   {
     title: "Ganti ke drg. Rina.",
-    body: "Buka Experts · Skills · Connectors, pilih Connectors, lalu hapus dental-clinic-brain. Klik New Task dan ulangi langkah 2 sampai 4, tetapi pilih drg. Rina. Tanya lagi soal P-0007: kali ini Dira menjawab dengan sumber emr://.",
+    body: "Di menu kiri, buka Connectors dan hapus dental-clinic-brain. Klik New Task, ulangi langkah 2 sampai 4 sebagai drg. Rina, lalu tanya lagi soal P-0007. Kali ini Dira menjawab dengan sumber emr://.",
   },
   {
     title: "Coba DentalClinic Team.",
-    body: "Klik New Task, pilih DentalClinic Team, lalu tanya “Siapa yang belum selesai PSA bulan lalu? Buatkan pengingat.”. Token yang sama tetap berlaku.",
+    body: "Klik New Task, pilih DentalClinic Team, lalu tanya “Siapa yang belum selesai PSA bulan lalu? Buatkan pengingat.”",
   },
 ];
 
