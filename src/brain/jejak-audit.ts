@@ -43,7 +43,7 @@ interface AskEntry {
   askedAt: string;
 }
 
-/** Appends one Jejak Audit row and returns its id. */
+/** Appends one Jejak Audit row for a question and returns its id. */
 export async function recordAsk({
   caller,
   filter,
@@ -70,6 +70,53 @@ export async function recordAsk({
     answered_at: new Date().toISOString(),
   };
 
+  return append(row);
+}
+
+/** A Jejak Audit row for a tool call other than a question: a lookup, a Proposal or an Approval Decision. */
+interface ActionEntry {
+  caller: Staff;
+  /** What was acted on, such as "Recall Message P-0004". */
+  subject: string;
+  /** The Source filter the action was taken under; null for a decision. */
+  filter: Guard | null;
+  /** The URIs of the Sources the action rests on. */
+  cited: string[];
+  text: string;
+  decision: "answered" | "proposed" | "accepted" | "declined";
+  reason?: "expired";
+  at: string;
+}
+
+/** Appends one Jejak Audit row for a lookup, Proposal or Approval Decision and returns its id. */
+export function recordAction({
+  caller,
+  subject,
+  filter,
+  cited,
+  text,
+  decision,
+  reason,
+  at,
+}: ActionEntry) {
+  return append({
+    staff_id: caller.id,
+    role: caller.role,
+    filter: filter && JSON.stringify(filter),
+    question: subject,
+    retrieved: JSON.stringify(cited),
+    cited: JSON.stringify(cited),
+    answer: mask(text),
+    decision,
+    reason: reason ?? null,
+    flags: "[]",
+    asked_at: at,
+    answered_at: at,
+  });
+}
+
+/** Appends a row to the end of the chain and returns its id. */
+async function append(row: Hashed): Promise<number> {
   // The insert only lands on the chain's current head; a concurrent append makes it retry.
   for (let attempt = 0; attempt < 5; attempt++) {
     const prev = await env.DB.prepare(HEAD).first<string>("hash");
@@ -107,11 +154,11 @@ export interface AuditRow {
   askedAt: string;
   staff: string;
   question: string;
-  decision: Decision;
+  decision: Decision | ActionEntry["decision"];
   /** The URIs of the Sources cited. */
   cited: string[];
-  /** Why a Refusal was given; null unless the caller may see the whole Jejak Audit. */
-  reason: Reason | null;
+  /** Why a Refusal was given or a Proposal declined; null unless the caller may see the whole Jejak Audit. */
+  reason: Reason | "expired" | null;
   /** Empty unless the caller may see the whole Jejak Audit. */
   flags: InjectionFlag[];
 }

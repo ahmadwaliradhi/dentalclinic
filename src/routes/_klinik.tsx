@@ -1,4 +1,5 @@
 import { createFileRoute, Link, Outlet, redirect } from "@tanstack/react-router";
+import { decidesProposals } from "@/brain/access";
 import { Button } from "@/components/ui/button";
 import { me } from "@/web";
 
@@ -13,6 +14,7 @@ export const Route = createFileRoute("/_klinik")({
 });
 
 const views = [
+  { to: "/persetujuan", label: "Persetujuan" },
   { to: "/pasien", label: "Pasien" },
   { to: "/jadwal", label: "Jadwal" },
   { to: "/stok", label: "Stok" },
@@ -28,16 +30,19 @@ function Klinik() {
     <div className="mx-auto max-w-5xl px-4 sm:px-6">
       <header className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b py-3 text-sm">
         <nav className="flex gap-1">
-          {views.map((view) => (
-            <Link
-              key={view.to}
-              to={view.to}
-              className="rounded-md px-2.5 py-1.5 text-muted-foreground hover:text-foreground"
-              activeProps={{ className: "bg-secondary text-foreground" }}
-            >
-              {view.label}
-            </Link>
-          ))}
+          {views
+            // Only a Role that makes Approval Decisions gets the inbox.
+            .filter((view) => view.to !== "/persetujuan" || decidesProposals(staff))
+            .map((view) => (
+              <Link
+                key={view.to}
+                to={view.to}
+                className="rounded-md px-2.5 py-1.5 text-muted-foreground hover:text-foreground"
+                activeProps={{ className: "bg-secondary text-foreground" }}
+              >
+                {view.label}
+              </Link>
+            ))}
         </nav>
         <form method="post" action="/keluar" className="ml-auto flex items-center gap-3">
           <span>

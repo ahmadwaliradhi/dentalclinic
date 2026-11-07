@@ -54,7 +54,12 @@ it("lists no finance tools for Front Office or TGM (T18)", async () => {
     const response = await mcp(await pair(staffId), "tools/list");
     const { result } = await response.json<{ result: { tools: { name: string }[] } }>();
 
-    expect(result.tools.map((tool) => tool.name)).toEqual(["who_am_i", "ask"]);
+    expect(result.tools.map((tool) => tool.name)).toEqual([
+      "who_am_i",
+      "ask",
+      "due_for_recall",
+      "propose_recall_message",
+    ]);
   }
 });
 
@@ -66,8 +71,8 @@ it("lists the kpi tool only for the Pemilik and answers through it", async () =>
   };
   const rina = await pair("rina");
 
-  expect(await tools(rina)).toEqual(["who_am_i", "ask", "kpi"]);
-  expect(await tools(await pair("andi"))).toEqual(["who_am_i", "ask"]);
+  expect(await tools(rina)).toContain("kpi");
+  expect(await tools(await pair("andi"))).not.toContain("kpi");
 
   const answer = await callTool(rina, "kpi", { query: "Overhead klinik berapa persen?" });
   expect(answer).toMatchObject({ decision: "answered", auditId: expect.any(Number) });

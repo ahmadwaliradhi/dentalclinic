@@ -1,4 +1,5 @@
 import handler from "@tanstack/react-start/server-entry";
+import { nightly } from "./brain/nightly";
 import { handleMcp } from "./mcp";
 
 export default {
@@ -8,6 +9,6 @@ export default {
     return handler.fetch(request);
   },
   async scheduled(_event, _env, _ctx) {
-    // Nightly seed reset belongs to a later ticket.
+    await nightly();
   },
 } satisfies ExportedHandler<Env>;

@@ -56,6 +56,19 @@ export function patientsVisibleTo(caller: Staff): Guard {
   }
 }
 
+/**
+ * Patients whose Proposals the caller may decide, as an SQL condition on `patients`: every patient
+ * for the Pemilik, a Dokter Gigi Mitra's own, none for anyone else.
+ */
+export function proposalsDecidedBy(caller: Staff): Guard {
+  return decidesProposals(caller) ? patientsVisibleTo(caller) : { sql: "FALSE", params: [] };
+}
+
+/** Whether the caller makes Approval Decisions at all. */
+export function decidesProposals(caller: Pick<Staff, "role">): boolean {
+  return caller.role === "Pemilik" || caller.role === "Dokter Gigi Mitra";
+}
+
 /** Clinic finance, such as what an Aset cost, is the Pemilik's alone. */
 export function seesClinicFinance(caller: Staff): boolean {
   return caller.role === "Pemilik";
