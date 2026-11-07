@@ -1,13 +1,13 @@
 import { env } from "cloudflare:workers";
 import type { Answer, Reason } from "./ask";
 import { mask } from "./mask";
-import type { Chunk } from "./search";
 import type { Staff } from "./staff";
 
 interface AskEntry {
   caller: Staff;
   question: string;
-  retrieved: Chunk[];
+  /** The Sources looked at, cited or not. */
+  retrieved: { uri: string }[];
   answer: Omit<Answer, "auditId">;
   reason: Reason | null;
   askedAt: string;

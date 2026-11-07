@@ -41,12 +41,13 @@ npx vitest run test/page.test.ts
 
 ## MCP
 
-`POST /mcp` is a stateless Streamable HTTP MCP server with two tools:
+`POST /mcp` is a stateless Streamable HTTP MCP server with three tools:
 
 - `who_am_i` returns the staff member and Role behind the bearer token.
 - `ask` returns the answer envelope: `text` (final, cited, shown verbatim), `decision` (`answered`, `unknown_routed` or `refusal`), `citations` (URI, date, quoted text), `flags` (instruction-like sentences found in retrieved Sources and not followed) and `auditId`. Every call writes one Jejak Audit row.
+- `kpi`, listed for the Pemilik only, returns the same envelope for Keuangan & Aset: Payback per Aset, Margin per Tindakan and overhead % against the 59% international reference, each with its formula and Sources. `ask` routes these questions to it too, so every other Role gets the Refusal either way. Tax grouping of an Aset is always "saya tidak tahu".
 
-`ask` searches only what the caller's Role may see (`src/brain/access.ts`, applied in SQL). Restricted data and data that does not exist get the same Refusal, byte for byte; only the Jejak Audit row records the true reason (`restricted` or `not_found`). NIK and phone numbers keep their last 4 digits and email keeps its domain in everything `ask` returns. There are no finance tools yet; `test/mcp.test.ts` pins the TGM and Front Office tool lists so one cannot appear for them.
+`ask` searches only what the caller's Role may see (`src/brain/access.ts`, applied in SQL). Restricted data and data that does not exist get the same Refusal, byte for byte; only the Jejak Audit row records the true reason (`restricted` or `not_found`). NIK and phone numbers keep their last 4 digits and email keeps its domain in everything `ask` returns. A cited Source with an expiry date, such as a SIP, adds a warning from 90 days before it ends. `test/mcp.test.ts` pins every Role's tool list.
 
 The caller comes only from the bearer token. Until Identity Pairing lands, four public demo tokens stand in for Demo Login: `demo-rina`, `demo-andi`, `demo-tari` and `demo-nina`. Only their SHA-256 hashes are stored. A missing or unknown token gets 401. Production needs `npm run db:seed -- --remote` once for the tokens to exist.
 

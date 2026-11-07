@@ -2,6 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { z } from "zod";
 import { ask } from "./brain/ask";
+import { kpi } from "./brain/kpi";
 import { staffForToken } from "./brain/staff";
 
 /** Stateless MCP endpoint. The bearer token alone decides who is calling. */
@@ -12,7 +13,6 @@ export async function handleMcp(request: Request): Promise<Response> {
     return new Response(null, { status: 401, headers: { "WWW-Authenticate": "Bearer" } });
   }
 
-  // A finance tool must register only for the Pemilik and Dokter Gigi Mitra; T18 pins the rest.
   const server = new McpServer({ name: "dentalclinic", version: "1.0.0" });
 
   server.registerTool(
@@ -34,6 +34,20 @@ export async function handleMcp(request: Request): Promise<Response> {
     },
     async ({ question }) => toolResult(await ask(caller, question)),
   );
+
+  // Finance tools register for the Pemilik alone; T18 pins the rest.
+  if (caller.role === "Pemilik") {
+    server.registerTool(
+      "kpi",
+      {
+        description:
+          "Keuangan & Aset: Payback per Aset, Margin per Tindakan and overhead %, with formula and Sources. Show `text` to the user exactly as returned.",
+        inputSchema: { query: z.string().min(1) },
+        annotations: { readOnlyHint: true },
+      },
+      async ({ query }) => toolResult(await kpi(caller, query)),
+    );
+  }
 
   const transport = new WebStandardStreamableHTTPServerTransport({ enableJsonResponse: true });
   await server.connect(transport);

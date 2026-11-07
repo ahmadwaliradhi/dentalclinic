@@ -50,7 +50,7 @@ Seeded situations: a scaling tariff conflict (2024 tariff list Rp150k vs a newer
 
 ## Keuangan & Aset
 
-Payback months per Aset; Margin per Tindakan; overhead % against a 59% international reference. Depreciation is straight-line over 8 years with a caveat. No reorder logic beyond the Stok Opname conflict.
+Payback months per Aset; Margin per Tindakan; overhead % against a 59% international reference. Depreciation is straight-line over 8 years with a caveat. No reorder logic beyond the Stok Opname conflict. Keuangan & Aset answers are for the Pemilik only, since they show every dentist's fees. Payback uses today's tariffs and the last three closed months' volumes. STR is lifelong under UU 17/2023, so only the SIP carries an expiry date.
 
 ## Tech
 
