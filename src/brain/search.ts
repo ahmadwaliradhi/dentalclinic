@@ -10,6 +10,8 @@ export interface Chunk {
   /** Shared by Sources stating the same fact; see Source Conflict. */
   fact: string | null;
   authorRole: Role;
+  /** The last day the Source is valid, as YYYY-MM-DD, or null. */
+  expiresOn: string | null;
 }
 
 const STOPWORDS = words(
@@ -33,7 +35,8 @@ export async function search(question: string, guard: Guard): Promise<Chunk[]> {
   if (keywords.length === 0) return [];
 
   const { results } = await env.DB.prepare(
-    `SELECT sources.uri, sources.dated, sources.body AS text, sources.fact, staff.role AS authorRole
+    `SELECT sources.uri, sources.dated, sources.body AS text, sources.fact, staff.role AS authorRole,
+       sources.expires_on AS expiresOn
      FROM source_search JOIN sources USING (uri) JOIN staff ON staff.id = sources.author_id
      WHERE source_search MATCH ?
        AND (sources.subject IS NULL OR sources.subject IN (SELECT value FROM json_each(?)))

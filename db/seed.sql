@@ -224,3 +224,65 @@ INSERT INTO sources (uri, author_id, dated, body, fact) VALUES
   ('chat://wa/grup-klinik/msg-2206', 'rina', '2026-11-06T02:00:00Z',
     'Mulai bulan ini tarif scaling Rp200.000 per kunjungan.', 'tarif/scaling')
 ON CONFLICT DO NOTHING;
+
+-- Keuangan & Aset. Tariffs follow the newest Pemilik decision (scaling Rp200.000).
+INSERT INTO procedures (code, name, tariff, bmhp, effective_on) VALUES
+  ('scaling', 'Scaling', 200000, 25000, '2026-11-06'),
+  ('komposit', 'Tumpatan komposit', 400000, 60000, '2026-11-06'),
+  ('pencabutan', 'Pencabutan', 300000, 35000, '2026-11-06'),
+  ('psa', 'PSA', 800000, 120000, '2026-11-06'),
+  ('ortodonti', 'Kontrol ortodonti', 300000, 30000, '2026-11-06'),
+  ('panoramik', 'Foto panoramik', 350000, 40000, '2026-11-06')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO aset (id, name, price, bought_on) VALUES
+  ('dental-unit', 'Dental unit', 45000000, '2026-02-09'),
+  ('scaler-ultrasonik', 'Scaler ultrasonik', 8000000, '2026-08-03'),
+  ('x-ray-panoramik', 'X-ray panoramik', 180000000, '2025-11-17')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO aset_procedures (aset_id, procedure) VALUES
+  ('dental-unit', 'komposit'),
+  ('dental-unit', 'pencabutan'),
+  ('dental-unit', 'psa'),
+  ('scaler-ultrasonik', 'scaling'),
+  ('x-ray-panoramik', 'panoramik')
+ON CONFLICT DO NOTHING;
+
+-- Procedures done per dentist per month.
+INSERT INTO procedure_counts (month, procedure, dentist_id, count) VALUES
+  ('2026-08', 'scaling', 'andi', 4), ('2026-08', 'komposit', 'andi', 38),
+  ('2026-08', 'pencabutan', 'andi', 17), ('2026-08', 'psa', 'andi', 13),
+  ('2026-08', 'scaling', 'rina', 6), ('2026-08', 'panoramik', 'rina', 9),
+  ('2026-08', 'ortodonti', 'maya', 112),
+  ('2026-09', 'scaling', 'andi', 5), ('2026-09', 'komposit', 'andi', 40),
+  ('2026-09', 'pencabutan', 'andi', 18), ('2026-09', 'psa', 'andi', 14),
+  ('2026-09', 'scaling', 'rina', 6), ('2026-09', 'panoramik', 'rina', 10),
+  ('2026-09', 'ortodonti', 'maya', 116),
+  ('2026-10', 'scaling', 'andi', 6), ('2026-10', 'komposit', 'andi', 42),
+  ('2026-10', 'pencabutan', 'andi', 19), ('2026-10', 'psa', 'andi', 15),
+  ('2026-10', 'scaling', 'rina', 9), ('2026-10', 'panoramik', 'rina', 11),
+  ('2026-10', 'ortodonti', 'maya', 120)
+ON CONFLICT DO NOTHING;
+
+INSERT INTO monthly_books (month, overhead, collections) VALUES
+  ('2026-08', 44800000, 70500000),
+  ('2026-09', 45600000, 73200000),
+  ('2026-10', 47100000, 76300000)
+ON CONFLICT DO NOTHING;
+
+-- STR is valid for life (UU 17/2023); a SIP lasts five years. drg. Andi's SIP ends within 90 days.
+INSERT INTO sources (uri, author_id, dated, body, subject, expires_on) VALUES
+  ('doc://izin-praktik/rina#str', 'rina', '2014-03-10T00:00:00Z',
+    'STR drg. Rina berlaku seumur hidup.', 'rina', NULL),
+  ('doc://izin-praktik/rina#sip', 'rina', '2023-06-12T00:00:00Z',
+    'SIP drg. Rina di Klinik Gigi Senyum Sejahtera nomor 503/0231/SIP-DG/2023 berlaku sampai 12 Juni 2028.', 'rina', '2028-06-12'),
+  ('doc://izin-praktik/andi#str', 'rina', '2019-08-22T00:00:00Z',
+    'STR drg. Andi berlaku seumur hidup.', 'andi', NULL),
+  ('doc://izin-praktik/andi#sip', 'rina', '2022-01-20T00:00:00Z',
+    'SIP drg. Andi di Klinik Gigi Senyum Sejahtera nomor 503/0112/SIP-DG/2022 berlaku sampai 20 Januari 2027.', 'andi', '2027-01-20'),
+  ('doc://izin-praktik/maya#str', 'rina', '2017-05-04T00:00:00Z',
+    'STR drg. Maya, Sp.Ort berlaku seumur hidup.', 'maya', NULL),
+  ('doc://izin-praktik/maya#sip', 'rina', '2024-03-01T00:00:00Z',
+    'SIP drg. Maya, Sp.Ort di Klinik Gigi Senyum Sejahtera nomor 503/0087/SIP-DG/2024 berlaku sampai 1 Maret 2029.', 'maya', '2029-03-01')
+ON CONFLICT DO NOTHING;

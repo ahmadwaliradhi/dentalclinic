@@ -30,6 +30,10 @@ _Avoid_: ROI (unqualified), break-even
 A procedure's tariff minus its consumables (BMHP) and the dentist's fee.
 _Avoid_: profit, HPP
 
+**Overhead %**:
+The clinic's overhead divided by the money it collected over the last three closed months, set against the 59% international reference for general practice.
+_Avoid_: cost ratio, expense rate
+
 ## People
 
 **Role**:
@@ -43,6 +47,10 @@ _Avoid_: admin, owner, drg. PJ (as a separate role)
 **Dokter Gigi Mitra**:
 A dentist who practises at the clinic under a fee-share agreement; sees only their own patients and their own fees.
 _Avoid_: associate, doctor, drg. (as a role name)
+
+**SIP**:
+Surat Izin Praktik, a dentist's five-year licence to practise at one clinic; the Klinik Brain warns from 90 days before it ends.
+_Avoid_: license, izin (unqualified), STR (which is lifelong)
 
 **TGM**:
 Terapis Gigi dan Mulut; sees records of cases they assisted, stock, and sterilisation logs, never finance.
@@ -97,11 +105,11 @@ A human's accept or decline of a Proposal; expiry without a decision counts as d
 _Avoid_: confirmation, sign-off
 
 **Restricted**:
-Data that exists but the asking Role may not see: clinical notes for Front Office, another dentist's patients or fees for a Dokter Gigi Mitra, finance for TGM and Front Office, and unmasked NIK for anyone.
+Data that exists but the asking Role may not see: clinical notes for Front Office, another dentist's patients or fees, and clinic-wide Keuangan & Aset figures, for a Dokter Gigi Mitra, finance for TGM and Front Office, and unmasked NIK for anyone.
 _Avoid_: private, hidden, forbidden
 
 **Source**:
-A single clinic record the Klinik Brain cites: a medical record entry (emr), a document such as an SOP or tariff list (doc), a log entry such as a sterilisation or stock count (task), or a WhatsApp group message (chat).
+A single clinic record the Klinik Brain cites: a medical record entry (emr), a document such as an SOP or tariff list (doc), a log entry such as a sterilisation, stock count or month's books (task), or a WhatsApp group message (chat).
 _Avoid_: reference, document (for all types), evidence
 
 **Source Conflict**:

@@ -72,3 +72,18 @@ it("lists no finance tools for Front Office or TGM (T18)", async () => {
     expect(result.tools.map((tool) => tool.name)).toEqual(["who_am_i", "ask"]);
   }
 });
+
+it("lists the kpi tool only for the Pemilik and answers through it", async () => {
+  const tools = async (token: string) => {
+    const response = await post(token, "tools/list");
+    const { result } = await response.json<{ result: { tools: { name: string }[] } }>();
+    return result.tools.map((tool) => tool.name);
+  };
+
+  expect(await tools("demo-rina")).toEqual(["who_am_i", "ask", "kpi"]);
+  expect(await tools("demo-andi")).toEqual(["who_am_i", "ask"]);
+
+  const answer = await callTool("demo-rina", "kpi", { query: "Overhead klinik berapa persen?" });
+  expect(answer).toMatchObject({ decision: "answered", auditId: expect.any(Number) });
+  expect(answer.text).toMatch(/^Overhead Agustus–Oktober 2026: 62,5% dari penerimaan/);
+});

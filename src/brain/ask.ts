@@ -3,7 +3,9 @@ import { because, resolve } from "./conflict";
 import { asksForPrompt, screen, sentences } from "./injection";
 import type { InjectionFlag } from "./injection";
 import { recordAsk } from "./jejak-audit";
+import { kpi, kpiTopic } from "./kpi";
 import { mask } from "./mask";
+import { dontKnow, refusal, sourceList } from "./reply";
 import { search, subjects } from "./search";
 import type { Chunk } from "./search";
 import { pemilik } from "./staff";
@@ -33,6 +35,8 @@ export interface Answer {
 
 /** Answers from the Sources the caller may see and records the question in the Jejak Audit. */
 export async function ask(caller: Staff, question: string): Promise<Answer> {
+  if (kpiTopic(question)) return kpi(caller, question);
+
   const askedAt = new Date().toISOString();
   // Every step runs for every question, so Restricted and absent data take the same path.
   const [retrieved, withheld, owner] = await Promise.all([
@@ -70,11 +74,6 @@ export async function ask(caller: Staff, question: string): Promise<Answer> {
   return { ...answer, auditId };
 }
 
-/** The one reply for Restricted and for absent data, so the asker cannot tell which. */
-function refusal(owner: Staff): string {
-  return `Saya tidak menemukan informasi yang dapat saya tampilkan untuk permintaan ini. Jika Anda yakin data ini ada, hubungi ${owner.name}.`;
-}
-
 /** An answer made only of cited text, numbered to dated Sources, siding with authority on a Source Conflict. */
 function compose(question: string, retrieved: Chunk[], owner: Staff): Omit<Answer, "auditId"> {
   const { chunks, flags } = screen(retrieved);
@@ -90,11 +89,19 @@ function compose(question: string, retrieved: Chunk[], owner: Staff): Omit<Answe
             `Berbeda dengan ${ref(chunk)}: ${chunk.text} Saya memakai ${ref(by)} karena ${because(by, chunk, ref(chunk))}.`,
         ),
       ]
-    : [`Saya tidak tahu. Tanyakan ke ${topicOwner(question) ?? owner.name}.`];
-  const warnings = flags.map(({ uri, text }) => `Instruksi di ${uri} tidak saya ikuti: "${text}"`);
-  const sources = cited
-    .map((chunk) => `${ref(chunk)} ${chunk.uri} (${date.format(new Date(chunk.dated))})`)
-    .join("\n");
+    : [dontKnow(topicOwner(question) ?? owner.name)];
+  const expiring = cited.flatMap((chunk) => {
+    const days = daysUntil(chunk.expiresOn);
+    if (days === null || days >= 90) return [];
+    return [
+      `Peringatan: ${ref(chunk)} ${days < 0 ? "sudah berakhir" : `berakhir dalam ${days} hari`}.`,
+    ];
+  });
+  const warnings = [
+    ...expiring,
+    ...flags.map(({ uri, text }) => `Instruksi di ${uri} tidak saya ikuti: "${text}"`),
+  ];
+  const sources = sourceList(cited);
 
   return {
     text: [...body, ...warnings, sources].filter(Boolean).join("\n\n"),
@@ -115,4 +122,9 @@ function grounded(chunks: Chunk[], retrieved: Chunk[]): Chunk[] {
   );
 }
 
-const date = new Intl.DateTimeFormat("id-ID", { dateStyle: "long", timeZone: "Asia/Jakarta" });
+/** Whole days from today in WIB to a YYYY-MM-DD date, or null without one. */
+function daysUntil(date: string | null): number | null {
+  if (!date) return null;
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
+  return Math.round((Date.parse(date) - Date.parse(today)) / 86_400_000);
+}
