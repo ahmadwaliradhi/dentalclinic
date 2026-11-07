@@ -1,5 +1,7 @@
 # DentalClinic Brain
 
+Live: [dentalclinic.ahmadwaliradhi.workers.dev](https://dentalclinic.ahmadwaliradhi.workers.dev)
+
 One TanStack Start application on one Cloudflare Worker, with D1. The placeholder is Indonesian; clinic features land in later tickets. Domain vocabulary lives in [GLOSSARY.md](GLOSSARY.md), architecture in [docs/adr](docs/adr/).
 
 ## Run
