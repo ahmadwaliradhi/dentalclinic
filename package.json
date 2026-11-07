@@ -15,7 +15,7 @@
     "db:migrate": "CI=true wrangler d1 migrations apply DB --config wrangler.jsonc",
     "db:seed": "CI=true wrangler d1 execute DB --config wrangler.jsonc --file db/seed.sql",
     "cf:types": "wrangler types",
-    "expert:zip": "cd expert && for name in *; do zip=$name; [ $name = dira-cepat ] && zip=dentalclinic-expert; rm -f ../public/$zip.zip && zip -qrX ../public/$zip.zip $name -x '*.DS_Store'; done",
+    "expert:zip": "cd expert && for name in *; do zip=$name; [ $name = dira-cepat ] && zip=dental-clinic-expert; rm -f ../public/$zip.zip && zip -qrX ../public/$zip.zip $name -x '*.DS_Store'; done",
     "expert:install": "sh scripts/install-expert.sh",
     "deploy": "npm run build && wrangler deploy"
   },

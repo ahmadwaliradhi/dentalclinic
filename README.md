@@ -70,7 +70,7 @@ Two Experts reach the Dental Clinic Brain only through the `dental-clinic-brain`
 - `expert/dira-cepat/` is **Dira Cepat**, a single agent that calls one tool per question. Use it for everyday questions.
 - `expert/dentalclinic-team/` is the **DentalClinic Team** for complex requests. Dira leads and pairs but fetches nothing herself. Bima (`keuangan-aset`) answers Keuangan & Aset with `ask`; Sari (`pasien-recall`) answers Pasien & Recall and everything else with the same tools as Dira Cepat. Wulan (`peninjau`) reviews every result for citations, masking and the exact Refusal before Dira shows it. After a third failed review Dira shows nothing and points the staff member to the Pemilik and the Jejak Audit.
 
-`npm run build` zips each package to `/<name>.zip`, except Dira Cepat, which ships as `/dentalclinic-expert.zip`: the landing page links `/dentalclinic-expert.zip` in the hero and `/dentalclinic-team.zip` under Tim. To build only the zips, run `npm run expert:zip`.
+`npm run build` zips each package to `/<name>.zip`, except Dira Cepat, which ships as `/dental-clinic-expert.zip`: the landing page links `/dental-clinic-expert.zip` in the hero and `/dentalclinic-team.zip` under Tim. To build only the zips, run `npm run expert:zip`.
 
 To install both into WorkBuddy on this Mac, validated and registered by WorkBuddy's own expert-manager scripts:
 

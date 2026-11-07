@@ -194,7 +194,7 @@ it("has Wulan hold results to the engine's own Refusal and masking", () => {
 });
 
 it("serves each Expert zip where the landing page links to it", async () => {
-  expect(release.expertZipUrl).toBe("/dentalclinic-expert.zip");
+  expect(release.expertZipUrl).toBe("/dental-clinic-expert.zip");
   expect(release.teamZipUrl).toBe("/dentalclinic-team.zip");
 
   for (const url of [release.expertZipUrl, release.teamZipUrl]) {
