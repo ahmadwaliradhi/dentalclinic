@@ -1,0 +1,119 @@
+name: CI
+
+# Pull requests run the two check jobs only. A push to `main` (or a manual run on
+# `main`) runs them again and then deploys, so a failing check never reaches
+# production. See docs/adr/0003-deploy-on-merge-with-github-actions.md.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  CI: true
+  WRANGLER_SEND_METRICS: "false"
+
+jobs:
+  static:
+    name: Lint, format and types
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run typecheck
+
+  worker:
+    name: Worker build, tests and package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # Builds the real Worker, migrates and seeds local D1, then runs Vitest in workerd.
+      - run: npm test
+      # Proves the Worker still packages and resolves every binding, and publishes nothing.
+      # Reuses the build `npm test` produced.
+      - name: Package for deployment
+        run: npx wrangler deploy --dry-run
+
+  deploy:
+    name: Deploy to Cloudflare Workers
+    needs: [static, worker]
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    environment:
+      name: production
+      url: https://dentalclinic.ahmadwaliradhi.workers.dev
+    env:
+      PRODUCTION_URL: https://dentalclinic.ahmadwaliradhi.workers.dev
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Require Cloudflare credentials
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CLOUDFLARE_API_TOKEN:-}" ] || [ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
+            echo "::error::Set CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID as repository secrets. See README, CI/CD."
+            exit 1
+          fi
+      # Build before touching the database, so a broken build never migrates production.
+      - name: Build
+        run: npm run build
+      - name: Apply D1 migrations to the remote database
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npm run db:migrate -- --remote
+      - name: Upload the Worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx wrangler deploy
+      - name: Smoke test production
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            if body=$(curl --fail --silent --show-error --max-time 10 "$PRODUCTION_URL"); then
+              if printf '%s' "$body" | grep -q '<title>DentalClinic Brain</title>'; then
+                echo "$PRODUCTION_URL served the expected page."
+                exit 0
+              fi
+            fi
+            echo "Attempt $attempt did not return the expected page; retrying in 5s."
+            sleep 5
+          done
+          echo "::error::$PRODUCTION_URL did not serve the expected page after deploy."
+          exit 1

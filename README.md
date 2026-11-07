@@ -26,6 +26,8 @@ npm run typecheck
 npm test
 ```
 
+`npm run check` runs those four in order, which is what CI runs.
+
 `npm test` builds the real Worker, migrates and seeds local D1 with the commands above, then runs Vitest **inside workerd**, not Node or jsdom. The database test reads that actual persistent local D1 through a test-only service binding backed by Wrangler's local platform proxy. HTTP and scheduled tests invoke the compiled Worker; scheduled tests use an isolated D1 binding. Tests never access remote D1.
 
 For a focused test after a source change:
@@ -59,6 +61,35 @@ curl --fail "http://localhost:5173/cdn-cgi/local/scheduled?cron=0+17+*+*+*"
 ```
 
 Use the port printed by Vite if 5173 is occupied. `test/scheduled.test.ts` also verifies completion and unchanged database contents.
+
+## CI/CD
+
+`.github/workflows/ci.yml` is the only path to production, and `docs/adr/0003-deploy-on-merge-with-github-actions.md` records why it is shaped this way.
+
+Every pull request runs two jobs:
+
+- **Lint, format and types** — `npm run lint`, `format:check`, `typecheck`.
+- **Worker build, tests and package** — `npm test`, then `wrangler deploy --dry-run` to prove the Worker still packages and resolves its bindings without publishing.
+
+A push to `main` runs both jobs and then **Deploy to Cloudflare Workers**, which is skipped on pull requests and on any other branch. It builds, applies pending D1 migrations to the remote database, uploads the Worker, then smoke-tests the `workers.dev` URL and fails the run if the page is not served. It never seeds: run `npm run db:seed -- --remote` yourself when seed data changes.
+
+To redeploy `main` without a new commit, run the workflow from the Actions tab or `gh workflow run ci.yml --ref main`.
+
+Two repository secrets are required; the deploy job stops with an explicit error if either is missing. Secrets reach only the steps that call Wrangler, never `npm ci`.
+
+| Secret                  | Value                                                                                                                                                     |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CLOUDFLARE_API_TOKEN`  | API token from <https://dash.cloudflare.com/profile/api-tokens>; start from the **Edit Cloudflare Workers** template and add **D1 → Edit** for migrations |
+| `CLOUDFLARE_ACCOUNT_ID` | Account ID from the dashboard, or `id` in `npx wrangler whoami`                                                                                           |
+
+```sh
+gh secret set CLOUDFLARE_API_TOKEN
+gh secret set CLOUDFLARE_ACCOUNT_ID
+```
+
+The deploy job runs in the `production` GitHub environment, so a required reviewer or a deployment branch rule can be added there without editing the workflow. Enable branch protection on `main` and require both check jobs before merging; without it, a direct push to `main` still deploys, just after the checks pass.
+
+`.github/dependabot.yml` opens weekly grouped pull requests for npm and Actions updates, which then go through the same checks.
 
 ## Deploy
 
