@@ -1,6 +1,6 @@
 import { env } from "cloudflare:workers";
 import seed from "../../db/seed.sql?raw";
-import { expireProposals } from "./recall";
+import { expireProposals } from "./proposals";
 
 /**
  * The nightly job: Proposals that ran out are declined and logged, then the demo returns to its

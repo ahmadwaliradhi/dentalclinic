@@ -1,7 +1,8 @@
 import { env, exports } from "cloudflare:workers";
 import { expect, it } from "vitest";
 import { auditFor } from "../src/brain/jejak-audit";
-import { decide, inbox, proposeRecallMessages } from "../src/brain/recall";
+import { decide, inbox } from "../src/brain/proposals";
+import { proposeRecallMessages } from "../src/brain/recall";
 import type { Staff } from "../src/brain/staff";
 
 // Vitest exposes scheduled events on its loopback stub; generated Fetcher types do not.

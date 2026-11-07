@@ -113,7 +113,7 @@ A single clinic record the Klinik Brain cites: a medical record entry (emr), a d
 _Avoid_: reference, document (for all types), evidence
 
 **Source Conflict**:
-Two Sources that disagree on the same fact; the higher-authority one wins (emr, then doc, then task, then Pemilik chat, then staff chat), except that a newer Pemilik chat overrides an older doc.
+Two Sources that disagree on the same fact; the higher-authority one wins (emr, then doc, then task, then Pemilik chat, then staff chat), except that a newer Pemilik chat overrides an older doc. No Source wins on stock: the stock is uncertain until a Stok Opname Request is counted.
 _Avoid_: inconsistency, discrepancy
 
 **Injection Flag**:

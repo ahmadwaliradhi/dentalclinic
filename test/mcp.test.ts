@@ -59,6 +59,7 @@ it("lists no finance tools for Front Office or TGM (T18)", async () => {
       "ask",
       "due_for_recall",
       "propose_recall_message",
+      "propose_stok_opname",
     ]);
   }
 });

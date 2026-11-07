@@ -1,7 +1,7 @@
 import { env } from "cloudflare:workers";
-import { patientsVisibleTo, proposalsDecidedBy, visitsVisibleTo } from "./access";
+import { patientsVisibleTo, visitsVisibleTo } from "./access";
 import { recordAction } from "./jejak-audit";
-import { mask } from "./mask";
+import { propose } from "./proposals";
 import { day } from "./reply";
 import type { Staff } from "./staff";
 
@@ -118,34 +118,18 @@ export async function proposeRecallMessages(caller: Staff, now = new Date(), onl
   const due = (await listDueForRecall(caller, now)).filter(
     (patient) => !only || only.includes(patient.noRm),
   );
-  const at = now.toISOString();
-  const expiresAt = new Date(now.getTime() + DAY).toISOString();
   const filter = visitsVisibleTo(caller);
 
   const proposals: Proposed[] = [];
   for (const patient of due.filter((patient) => patient.waOptIn)) {
     const text = recallMessage(patient);
-    // Lands only while the patient has no undecided Proposal, so a repeat request adds none.
-    const id = await env.DB.prepare(
-      `INSERT INTO proposals (kind, patient_no, text, proposed_by, proposed_at, expires_at)
-       SELECT 'recall_message', ?, ?, ?, ?, ?
-       WHERE NOT EXISTS (SELECT 1 FROM proposals
-                         WHERE patient_no = ? AND decision IS NULL AND expires_at > ?)
-       RETURNING id`,
-    )
-      .bind(patient.noRm, text, caller.id, at, expiresAt, patient.noRm, at)
-      .first<number>("id");
-    if (id === null) continue;
-    await recordAction({
+    const proposed = await propose(
       caller,
-      subject: `Recall Message ${patient.noRm}`,
-      filter,
-      cited: [patient.source],
-      text,
-      decision: "proposed",
-      at,
-    });
-    proposals.push({ id, noRm: patient.noRm, name: patient.name, text, expiresAt });
+      { kind: "recall_message", noRm: patient.noRm },
+      { text, cited: [patient.source], filter },
+      now,
+    );
+    if (proposed) proposals.push({ ...proposed, noRm: patient.noRm, name: patient.name, text });
   }
 
   const unreachable = due.filter((patient) => !patient.waOptIn);
@@ -164,113 +148,4 @@ export async function proposeRecallMessages(caller: Staff, now = new Date(), onl
 /** A friendly WhatsApp text with no clinical detail: no diagnosis, procedure or tooth. */
 function recallMessage({ name, dentist }: DueForRecall): string {
   return `Halo ${name}, ini Klinik Gigi Senyum Sejahtera. Sudah waktunya Anda kembali ke klinik bersama ${dentist}. Balas pesan ini untuk memilih jadwal yang cocok. Terima kasih.`;
-}
-
-export type Status = "pending" | "accepted" | "declined" | "expired";
-
-export interface Proposal {
-  id: number;
-  noRm: string;
-  name: string;
-  /** Masked; the full number is only in `whatsapp`. */
-  phone: string;
-  text: string;
-  proposedAt: string;
-  status: Status;
-  /** The wa.me link a human taps to send the text; only once accepted. */
-  whatsapp: string | null;
-}
-
-/** The Proposals the caller may decide, newest first, with any that ran out declined first. */
-export async function inbox(caller: Staff, now = new Date()): Promise<Proposal[]> {
-  await expireProposals(now);
-  const decides = proposalsDecidedBy(caller);
-  const { results } = await env.DB.prepare(
-    `SELECT proposals.id, patients.no_rm AS noRm, patients.name, patients.phone, proposals.text,
-       proposals.proposed_at AS proposedAt, proposals.decision, proposals.decided_by AS decidedBy
-     FROM proposals JOIN patients ON patients.no_rm = proposals.patient_no
-     WHERE ${decides.sql}
-     ORDER BY proposals.decision IS NOT NULL, proposals.id DESC`,
-  )
-    .bind(...decides.params)
-    .all<
-      Omit<Proposal, "status" | "whatsapp"> & { decision: string | null; decidedBy: string | null }
-    >();
-
-  return results.map(({ decision, decidedBy, phone, ...proposal }) => {
-    const status: Status = !decision ? "pending" : decidedBy ? (decision as Status) : "expired";
-    return {
-      ...proposal,
-      phone: mask(phone),
-      status,
-      whatsapp: status === "accepted" ? waLink(phone, proposal.text) : null,
-    };
-  });
-}
-
-/**
- * Records the caller's Approval Decision on an undecided Proposal they may decide, in the Jejak
- * Audit too, and returns the Proposal as it now stands; null when they may not decide it.
- */
-export async function decide(
-  caller: Staff,
-  id: number,
-  decision: "accepted" | "declined",
-  now = new Date(),
-): Promise<Proposal | null> {
-  await expireProposals(now);
-  const decides = proposalsDecidedBy(caller);
-  const at = now.toISOString();
-  const decided = await env.DB.prepare(
-    `UPDATE proposals SET decision = ?, decided_by = ?, decided_at = ?
-     WHERE id = ? AND decision IS NULL AND expires_at > ?
-       AND patient_no IN (SELECT no_rm FROM patients WHERE ${decides.sql})
-     RETURNING patient_no AS noRm, text`,
-  )
-    .bind(decision, caller.id, at, id, at, ...decides.params)
-    .first<{ noRm: string; text: string }>();
-  if (!decided) return null;
-
-  await recordAction({
-    caller,
-    subject: `Recall Message ${decided.noRm}`,
-    filter: null,
-    cited: [],
-    text: decided.text,
-    decision,
-    at,
-  });
-  return (await inbox(caller, now)).find((proposal) => proposal.id === id) ?? null;
-}
-
-/** Declines every Proposal undecided after 24 hours, as the Jejak Audit records on its proposer's behalf. */
-export async function expireProposals(now = new Date()): Promise<void> {
-  const { results } = await env.DB.prepare(
-    `UPDATE proposals SET decision = 'declined', decided_at = expires_at
-     WHERE decision IS NULL AND expires_at <= ?
-     RETURNING patient_no AS noRm, text,
-       (SELECT json_object('id', id, 'name', name, 'role', role) FROM staff
-        WHERE staff.id = proposals.proposed_by) AS proposer`,
-  )
-    .bind(now.toISOString())
-    .all<{ noRm: string; text: string; proposer: string }>();
-
-  for (const { noRm, text, proposer } of results) {
-    await recordAction({
-      caller: JSON.parse(proposer),
-      subject: `Recall Message ${noRm}`,
-      filter: null,
-      cited: [],
-      text,
-      decision: "declined",
-      reason: "expired",
-      at: now.toISOString(),
-    });
-  }
-}
-
-/** A wa.me link that opens WhatsApp with the text ready to send, from an Indonesian number. */
-function waLink(phone: string, text: string): string {
-  const number = phone.replace(/\D/g, "").replace(/^0/, "62");
-  return `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
 }

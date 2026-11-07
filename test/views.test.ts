@@ -83,6 +83,7 @@ it("shows the stock card to every Role", async () => {
   expect(await stockCard()).toEqual([
     { item: "Kapas gulung", quantity: 5, unit: "pak", countedAt: "2026-10-31T09:00:00Z" },
     { item: "Masker medis", quantity: 8, unit: "kotak", countedAt: "2026-10-31T09:00:00Z" },
+    { item: "Resin komposit A2", quantity: 4, unit: "tube", countedAt: "2026-10-31T09:00:00Z" },
     {
       item: "Sarung tangan nitril M",
       quantity: 6,

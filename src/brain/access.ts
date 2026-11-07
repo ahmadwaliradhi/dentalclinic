@@ -57,16 +57,29 @@ export function patientsVisibleTo(caller: Staff): Guard {
 }
 
 /**
- * Patients whose Proposals the caller may decide, as an SQL condition on `patients`: every patient
- * for the Pemilik, a Dokter Gigi Mitra's own, none for anyone else.
+ * Proposals the caller may decide, as an SQL condition on `proposals`: every one for the Pemilik, a
+ * Dokter Gigi Mitra's own patients' Recall Messages, Stok Opname Requests for a TGM, none for
+ * Front Office.
  */
 export function proposalsDecidedBy(caller: Staff): Guard {
-  return decidesProposals(caller) ? patientsVisibleTo(caller) : { sql: "FALSE", params: [] };
+  switch (caller.role) {
+    case "Pemilik":
+      return EVERYTHING;
+    case "Dokter Gigi Mitra":
+      return {
+        sql: "proposals.patient_no IN (SELECT no_rm FROM patients WHERE dentist_id = ?)",
+        params: [caller.id],
+      };
+    case "TGM":
+      return { sql: "proposals.kind = 'stok_opname'", params: [] };
+    case "Front Office":
+      return { sql: "FALSE", params: [] };
+  }
 }
 
 /** Whether the caller makes Approval Decisions at all. */
 export function decidesProposals(caller: Pick<Staff, "role">): boolean {
-  return caller.role === "Pemilik" || caller.role === "Dokter Gigi Mitra";
+  return caller.role !== "Front Office";
 }
 
 /** Clinic finance, such as what an Aset cost, is the Pemilik's alone. */

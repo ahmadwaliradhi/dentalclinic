@@ -294,7 +294,16 @@ ON CONFLICT DO NOTHING;
 INSERT INTO stock_items (item, quantity, unit, counted_at) VALUES
   ('Sarung tangan nitril M', 6, 'kotak', '2026-10-31T09:00:00Z'),
   ('Masker medis', 8, 'kotak', '2026-10-31T09:00:00Z'),
-  ('Kapas gulung', 5, 'pak', '2026-10-31T09:00:00Z')
+  ('Kapas gulung', 5, 'pak', '2026-10-31T09:00:00Z'),
+  ('Resin komposit A2', 4, 'tube', '2026-10-31T09:00:00Z')
+ON CONFLICT DO NOTHING;
+
+-- Stock disagreement: the stock card against Tari's newer chat. Neither wins; only a count settles it (T22).
+INSERT INTO sources (uri, author_id, dated, body, fact) VALUES
+  ('task://kartu-stok/resin-komposit-a2', 'tari', '2026-10-31T09:00:00Z',
+    'Kartu stok resin komposit A2: 4 tube.', 'stok/Resin komposit A2'),
+  ('chat://wa/grup-klinik/msg-2207', 'tari', '2026-11-06T08:30:00Z',
+    'Stok resin komposit A2 tinggal 1 tube, ya.', 'stok/Resin komposit A2')
 ON CONFLICT DO NOTHING;
 
 -- An already-expired Recall Message no one decided; the expiry job declines it and logs that (T12).

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import type { Proposal } from "@/brain/recall";
+import type { Proposal } from "@/brain/proposals";
 import { cn } from "@/lib/utils";
 import { proposals } from "@/web";
 
@@ -19,7 +19,9 @@ function Persetujuan() {
         <li key={proposal.id} className="grid gap-2 py-4">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
             <span className="font-medium">{proposal.name}</span>
-            <span className="font-mono text-sm text-muted-foreground">{proposal.phone}</span>
+            {proposal.phone && (
+              <span className="font-mono text-sm text-muted-foreground">{proposal.phone}</span>
+            )}
             <div className="ml-auto flex gap-2">
               <Decision proposal={proposal} />
             </div>

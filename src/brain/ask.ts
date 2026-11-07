@@ -1,5 +1,5 @@
 import { EVERYTHING, visibleTo } from "./access";
-import { because, resolve } from "./conflict";
+import { because, resolve, stockItem } from "./conflict";
 import { asksForPrompt, screen, sentences } from "./injection";
 import type { InjectionFlag } from "./injection";
 import { recordAsk } from "./jejak-audit";
@@ -78,8 +78,8 @@ export async function ask(caller: Staff, question: string): Promise<Answer> {
 /** An answer made only of cited text, numbered to dated Sources, siding with authority on a Source Conflict. */
 function compose(question: string, retrieved: Chunk[], owner: Staff): Omit<Answer, "auditId"> {
   const { chunks, flags } = screen(retrieved);
-  const { relied, overruled } = resolve(grounded(chunks, retrieved));
-  const cited = [...relied, ...overruled.map(({ chunk }) => chunk)];
+  const { relied, overruled, disputed } = resolve(grounded(chunks, retrieved));
+  const cited = [...relied, ...overruled.map(({ chunk }) => chunk), ...disputed.flat()];
   const ref = (chunk: Chunk) => `[${cited.indexOf(chunk) + 1}]`;
 
   const body = cited.length
@@ -88,6 +88,14 @@ function compose(question: string, retrieved: Chunk[], owner: Staff): Omit<Answe
         ...overruled.map(
           ({ chunk, by }) =>
             `Berbeda dengan ${ref(chunk)}: ${chunk.text} Saya memakai ${ref(by)} karena ${because(by, chunk, ref(chunk))}.`,
+        ),
+        // Never a reorder: a disagreement on stock only ever leads to a count.
+        ...disputed.map((counts) =>
+          [
+            `Stok ${stockItem(counts[0])} tidak pasti: ${counts.map(ref).join(" dan ")} berbeda.`,
+            ...counts.map((chunk) => `${chunk.text} ${ref(chunk)}`),
+            "Hanya hitung fisik yang memastikan; minta saya mengajukan Stok Opname Request.",
+          ].join(" "),
         ),
       ]
     : [dontKnow(topicOwner(question) ?? owner.name)];

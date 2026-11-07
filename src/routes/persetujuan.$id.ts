@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { decide } from "@/brain/recall";
+import { decide } from "@/brain/proposals";
 import { signedIn } from "@/session";
 
 /**

@@ -5,19 +5,39 @@ export interface Overruled {
   by: Chunk;
 }
 
-/** Splits Sources into those relied on and those a higher-authority Source on the same fact overrules. */
-export function resolve(chunks: Chunk[]): { relied: Chunk[]; overruled: Overruled[] } {
+/**
+ * Splits Sources into those relied on, those a higher-authority Source on the same fact overrules,
+ * and stock counts that disagree: no Source wins those, only a physical count does.
+ */
+export function resolve(chunks: Chunk[]): {
+  relied: Chunk[];
+  overruled: Overruled[];
+  disputed: Chunk[][];
+} {
   const relied: Chunk[] = [];
   const overruled: Overruled[] = [];
+  const disputed: Chunk[][] = [];
   for (const chunk of chunks) {
-    // One winner per fact, so the outcome never depends on which rival is looked at first.
     const rivals = chunks.filter((other) => other === chunk || sameFact(other, chunk));
+    if (rivals.length > 1 && stockItem(chunk)) {
+      if (rivals[0] === chunk) disputed.push(rivals);
+      continue;
+    }
+    // One winner per fact, so the outcome never depends on which rival is looked at first.
     const winner = rivals.reduce((best, other) => (wins(other, best) ? other : best));
     if (winner === chunk) relied.push(chunk);
     else overruled.push({ chunk, by: winner });
   }
-  return { relied, overruled };
+  return { relied, overruled, disputed };
 }
+
+/** The stock card item a Source counts, from a fact key such as 'stok/Masker medis', or null. */
+export function stockItem(chunk: Chunk): string | null {
+  return chunk.fact?.startsWith(STOCK) ? chunk.fact.slice(STOCK.length) : null;
+}
+
+/** The fact key prefix of a stock count. */
+export const STOCK = "stok/";
 
 /** Why `winner` beats `loser`, referring to the loser as `loserRef`. */
 export function because(winner: Chunk, loser: Chunk, loserRef: string): string {
