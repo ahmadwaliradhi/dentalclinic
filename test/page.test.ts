@@ -48,7 +48,7 @@ it("renders every section in the order the spec lists", async () => {
   expect(positions).toEqual([...positions].sort((a, b) => a - b));
 });
 
-it("shows the launch link, Expert zip and video from data", async () => {
+it("shows the launch link, Expert zips and video from data", async () => {
   const { html } = await landingHtml();
 
   // Empty data means "not published yet": the page says so instead of linking nowhere.
@@ -63,11 +63,13 @@ it("shows the launch link, Expert zip and video from data", async () => {
   expect(html).not.toMatch(/href=""|src=""/);
 });
 
-it("names the three principles and the four agents", async () => {
+it("names the three principles and the four agents, with the team's zip", async () => {
   const { html } = await landingHtml();
+  const team = html.slice(html.indexOf('id="tim"'), html.indexOf('id="demo-login"'));
 
   for (const word of ["Sumber", "Izin", "Jejak"]) expect(html).toContain(word);
-  for (const agent of ["Dira", "Sari", "Bima", "Wulan"]) expect(html).toContain(agent);
+  for (const agent of ["Dira", "Sari", "Bima", "Wulan"]) expect(team).toContain(agent);
+  expect(team).toContain(`href="${release.teamZipUrl}"`);
 });
 
 it("offers Demo Login as each of the four seeded staff members", async () => {

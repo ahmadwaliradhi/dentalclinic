@@ -1,0 +1,106 @@
+{
+  "name": "dentalclinic-team",
+  "version": "1.0.0",
+  "description": "Splits complex Klinik Gigi Senyum Sejahtera requests across a team that answers from the Dental Clinic Brain over MCP and reviews every answer.",
+  "author": { "name": "Ahmad Wali Radhi" },
+  "homepage": "https://dentalclinic.ahmadwaliradhi.workers.dev",
+  "license": "MIT",
+  "agents": [
+    "./agents/dentalclinic-team-lead.md",
+    "./agents/pasien-recall.md",
+    "./agents/keuangan-aset.md",
+    "./agents/peninjau.md"
+  ],
+  "expertType": "team",
+  "agentName": "dentalclinic-team-lead",
+  "teamInfo": {
+    "leadAgent": "dentalclinic-team-lead",
+    "memberAgents": ["pasien-recall", "keuangan-aset", "peninjau"]
+  },
+  "displayName": { "en": "DentalClinic Team", "zh": "DentalClinic 团队" },
+  "profession": { "en": "DentalClinic Team", "zh": "DentalClinic 团队" },
+  "displayDescription": {
+    "en": "Dira splits complex clinic requests between Sari for Pasien & Recall and Bima for Keuangan & Aset. Wulan checks citations, masking and Refusals before staff see the answer.",
+    "zh": "Dira分派复杂请求，Sari管患者复诊，Bima管财务资产，Wulan核查引用、脱敏与拒答。"
+  },
+  "avatar": "avatars/team.png",
+  "categoryId": "12-IndustryConsultant",
+  "defaultInitPrompt": {
+    "en": "Siapa yang belum selesai PSA bulan lalu? Buatkan pengingat.",
+    "zh": "Siapa yang belum selesai PSA bulan lalu? Buatkan pengingat."
+  },
+  "plugin": "dentalclinic-team",
+  "tags": [
+    { "en": "Pasien & Recall", "zh": "患者与复诊" },
+    { "en": "Keuangan & Aset", "zh": "财务与资产" },
+    { "en": "Reviewed answers", "zh": "审核把关" }
+  ],
+  "quickPrompts": [
+    {
+      "en": "Siapa yang belum selesai PSA bulan lalu? Buatkan pengingat.",
+      "zh": "Siapa yang belum selesai PSA bulan lalu? Buatkan pengingat."
+    },
+    {
+      "en": "Scaler ultrasonik balik modal kapan?",
+      "zh": "Scaler ultrasonik balik modal kapan?"
+    },
+    {
+      "en": "Siapa yang PSA-nya belum selesai, dan berapa margin PSA?",
+      "zh": "Siapa yang PSA-nya belum selesai, dan berapa margin PSA?"
+    }
+  ],
+  "members": [
+    {
+      "id": "dentalclinic-team-lead",
+      "displayName": { "en": "Dira", "zh": "Dira" },
+      "profession": { "en": "Clinic Coordinator", "zh": "诊所统筹" },
+      "avatar": "avatars/dentalclinic-team-lead.png",
+      "role": "lead"
+    },
+    {
+      "id": "pasien-recall",
+      "displayName": { "en": "Sari", "zh": "Sari" },
+      "profession": { "en": "Pasien & Recall", "zh": "患者与复诊" },
+      "avatar": "avatars/pasien-recall.png",
+      "role": "member"
+    },
+    {
+      "id": "keuangan-aset",
+      "displayName": { "en": "Bima", "zh": "Bima" },
+      "profession": { "en": "Keuangan & Aset", "zh": "财务与资产" },
+      "avatar": "avatars/keuangan-aset.png",
+      "role": "member"
+    },
+    {
+      "id": "peninjau",
+      "displayName": { "en": "Wulan", "zh": "Wulan" },
+      "profession": { "en": "Compliance Reviewer", "zh": "合规审核" },
+      "avatar": "avatars/peninjau.png",
+      "role": "member"
+    }
+  ],
+  "mcpServers": {
+    "dental-clinic-brain": {
+      "type": "http",
+      "url": "https://dentalclinic.ahmadwaliradhi.workers.dev/mcp",
+      "headers": { "Authorization": "Bearer ${DENTALCLINIC_TOKEN}" },
+      "x-workbuddy": {
+        "displayName": "Dental Clinic Brain",
+        "auth": {
+          "type": "token",
+          "tokenSchema": {
+            "title": "Dental Clinic Brain",
+            "fields": [
+              {
+                "key": "DENTALCLINIC_TOKEN",
+                "label": { "en": "Staff token", "zh": "员工令牌" },
+                "type": "password",
+                "required": true
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

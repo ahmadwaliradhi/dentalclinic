@@ -130,6 +130,11 @@ function Landing() {
       </Section>
       <Section id="tim" title="Tim">
         <Terms terms={team} className="grid-cols-2 sm:grid-cols-4" />
+        {release.teamZipUrl && (
+          <Button asChild variant="outline" className="mt-8">
+            <a href={release.teamZipUrl}>Unduh Tim</a>
+          </Button>
+        )}
       </Section>
       <Section id="demo-login" title="Demo Login">
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">

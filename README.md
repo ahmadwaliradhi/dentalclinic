@@ -65,19 +65,22 @@ npx @modelcontextprotocol/inspector --cli http://localhost:5173/mcp --transport 
 
 ## WorkBuddy Expert
 
-`expert/dira-cepat/` is **Dira Cepat**, the single-agent WorkBuddy Expert. It reaches the Dental Clinic Brain only through the `dental-clinic-brain` MCP server declared in its `plugin.json`, calls `ask` once per question and shows `text` unchanged. The package holds no token: the first time Dira Cepat is used, it runs Identity Pairing, and WorkBuddy's connect card fills the resulting token into `Bearer ${DENTALCLINIC_TOKEN}`.
+Two Experts reach the Dental Clinic Brain only through the `dental-clinic-brain` MCP server declared in their `plugin.json`, and show the engine's `text` unchanged. Neither package holds a token: the first time one is used, it runs Identity Pairing, and WorkBuddy's connect card fills the resulting token into `Bearer ${DENTALCLINIC_TOKEN}`. One token serves both.
 
-`npm run build` zips the package to `/dira-cepat.zip`, which the landing page links to. To build only the zip, run `npm run expert:zip`.
+- `expert/dira-cepat/` is **Dira Cepat**, a single agent that calls one tool per question. Use it for everyday questions.
+- `expert/dentalclinic-team/` is the **DentalClinic Team** for complex requests. Dira leads and pairs but fetches nothing herself. Bima (`keuangan-aset`) answers Keuangan & Aset with `ask`; Sari (`pasien-recall`) answers Pasien & Recall and everything else with the same tools as Dira Cepat. Wulan (`peninjau`) reviews every result for citations, masking and the exact Refusal before Dira shows it. After a third failed review Dira shows nothing and points the staff member to the Pemilik and the Jejak Audit.
 
-To install it into WorkBuddy on this Mac, validated and registered by WorkBuddy's own expert-manager scripts:
+`npm run build` zips each package to `/<name>.zip`: the landing page links `/dira-cepat.zip` in the hero and `/dentalclinic-team.zip` under Tim. To build only the zips, run `npm run expert:zip`.
+
+To install both into WorkBuddy on this Mac, validated and registered by WorkBuddy's own expert-manager scripts:
 
 ```sh
 npm run expert:install
 ```
 
-Then open Experts → My Experts → Dira Cepat and ask "Jam praktik klinik?". Dira Cepat gives a pairing link: open it, sign in with Demo Login, press Hubungkan WorkBuddy and tell Dira Cepat it is done. Paste the token it returns when WorkBuddy asks to connect `dental-clinic-brain`. To switch staff member, remove `dental-clinic-brain` under Connectors, pair again and start a New Task.
+`npm run expert:install -- dentalclinic-team` installs one. Then open Experts → My Experts → Dira Cepat and ask "Jam praktik klinik?", or the DentalClinic Team and ask "Siapa yang belum selesai PSA bulan lalu? Buatkan pengingat." as drg. Rina. The Expert gives a pairing link: open it, sign in with Demo Login, press Hubungkan WorkBuddy and say it is done. Paste the token it returns when WorkBuddy asks to connect `dental-clinic-brain`. To switch staff member, remove `dental-clinic-brain` under Connectors, pair again and start a New Task.
 
-From a downloaded zip: unzip it into `~/.workbuddy-ai/plugins/marketplaces/my-experts/plugins/` and ask WorkBuddy to "validate and register the expert dira-cepat", which runs the same expert-manager scripts. To share it, use ⋯ → Share → Copy link on the Expert in WorkBuddy and put the link in `launchUrl` in `src/data/release.json`.
+From a downloaded zip: unzip it into `~/.workbuddy-ai/plugins/marketplaces/my-experts/plugins/` and ask WorkBuddy to "validate and register the expert dentalclinic-team" (or `dira-cepat`), which runs the same expert-manager scripts. To share one, use ⋯ → Share → Copy link on the Expert in WorkBuddy and put the link in `launchUrl` in `src/data/release.json`.
 
 ## Database
 
@@ -161,7 +164,7 @@ Tailwind v4 uses neutral shadcn/ui tokens, a system font, and `components.json` 
 
 `/` is the Indonesian landing page. Its links and test results are data, not code:
 
-- `src/data/release.json`: WorkBuddy launch link, Expert zip and video embed URL. An empty value shows "Segera tersedia".
+- `src/data/release.json`: WorkBuddy launch link, Expert zips and video embed URL. An empty value shows "Segera tersedia"; an empty `teamZipUrl` hides its button.
 - `src/data/test-results.json`: one row per test case. `status` is `lulus`, `gagal` or `belum`; `evidenceUrl` links the status to a screenshot.
 
 Edit the JSON and redeploy.
