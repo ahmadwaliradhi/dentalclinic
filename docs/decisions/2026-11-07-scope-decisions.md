@@ -25,12 +25,12 @@ Klinik Gigi Senyum Sejahtera, a klinik pratama in Depok, about 40 patients.
 | drg. Rina | Pemilik (also drg. PJ) |
 | drg. Andi | Dokter Gigi Mitra (umum) |
 | drg. Maya Sp.Ort | Dokter Gigi Mitra (ortodonti) |
-| Tari | TGM |
+| Tari | Perawat Gigi |
 | Nina | Front Office |
 
 Topic Owners: Pasien & Recall and Keuangan & Aset go to drg. Rina; Dokter & Jadwal goes to Nina; stock and sterilisation go to Tari; tax and legal questions go to an external consultant ("konsultan pajak/hukum klinik").
 
-Seeded situations: a scaling tariff conflict (2024 tariff list Rp150k vs a newer Pemilik chat at Rp200k); a stock conflict (stock card says 4, TGM chat says "tinggal 1"); one SOP with an embedded injection instruction; a non-existent patient and a non-existent dentist for Refusal equality; one already-expired Proposal; three Aset (dental unit Rp45M, scaler ultrasonik Rp8M, panoramic X-ray Rp180M) linked to procedures; SIP expiry dates, with one under 90 days.
+Seeded situations: a scaling tariff conflict (2024 tariff list Rp150k vs a newer Pemilik chat at Rp200k); a stock conflict (stock card says 4, Perawat Gigi chat says "tinggal 1"); one SOP with an embedded injection instruction; a non-existent patient and a non-existent dentist for Refusal equality; one already-expired Proposal; three Aset (dental unit Rp45M, scaler ultrasonik Rp8M, panoramic X-ray Rp180M) linked to procedures; SIP expiry dates, with one under 90 days.
 
 ## Identity and access
 

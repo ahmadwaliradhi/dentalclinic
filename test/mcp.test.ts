@@ -49,7 +49,7 @@ it("ask over MCP returns the engine's answer envelope for the token's staff memb
   ).toEqual({ staff_id: "nina", role: "Front Office" });
 });
 
-it("lists no finance tools for Front Office or TGM (T18)", async () => {
+it("lists no finance tools for Front Office or Perawat Gigi (T18)", async () => {
   for (const staffId of ["nina", "tari"]) {
     const response = await mcp(await pair(staffId), "tools/list");
     const { result } = await response.json<{ result: { tools: { name: string }[] } }>();

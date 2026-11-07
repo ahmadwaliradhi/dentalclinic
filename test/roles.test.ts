@@ -78,7 +78,7 @@ it("gives drg. Rina drg. Maya's fee from the contract and the ledger (T21)", asy
 });
 
 it("shows Tari only the visits she assisted, and no finance", async () => {
-  const tari: Staff = { id: "tari", name: "Tari", role: "TGM" };
+  const tari: Staff = { id: "tari", name: "Tari", role: "Perawat Gigi" };
 
   expect((await ask(tari, "Apa diagnosis pasien P-0004?")).decision).toBe("answered");
   expect(await ask(tari, "Apa diagnosis pasien P-0007?")).toMatchObject(REFUSAL);

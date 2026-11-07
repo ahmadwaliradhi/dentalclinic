@@ -55,7 +55,7 @@ const team: Term[] = [
 const staff = [
   { slug: "rina", name: "drg. Rina", role: "Pemilik" },
   { slug: "andi", name: "drg. Andi", role: "Dokter Gigi Mitra" },
-  { slug: "tari", name: "Tari", role: "TGM" },
+  { slug: "tari", name: "Tari", role: "Perawat Gigi" },
   { slug: "nina", name: "Nina", role: "Front Office" },
 ];
 
