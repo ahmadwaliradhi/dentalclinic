@@ -1,9 +1,15 @@
+import { EVERYTHING, visibleTo } from "./access";
 import { recordAsk } from "./jejak-audit";
-import { search } from "./search";
+import { mask } from "./mask";
+import { search, subjects } from "./search";
 import type { Chunk } from "./search";
+import { pemilik } from "./staff";
 import type { Staff } from "./staff";
 
 export type Decision = "answered" | "refusal" | "unknown_routed";
+
+/** Why a Refusal was given. Recorded in the Jejak Audit, never shown to the asker. */
+export type Reason = "restricted" | "not_found";
 
 export interface Citation {
   uri: string;
@@ -19,17 +25,43 @@ export interface Answer {
   auditId: number;
 }
 
-/** Answers from clinic Sources and records the question in the Jejak Audit. */
+/** Answers from the Sources the caller may see and records the question in the Jejak Audit. */
 export async function ask(caller: Staff, question: string): Promise<Answer> {
   const askedAt = new Date().toISOString();
-  const retrieved = await search(question);
-  const citations = grounded(retrieved.slice(0, 1), retrieved);
-  const answer = citations.length
-    ? { text: render(citations), decision: "answered" as const, citations }
-    : { text: "Saya tidak tahu.", decision: "unknown_routed" as const, citations };
+  // Every step runs for every question, so Restricted and absent data take the same path.
+  const [retrieved, withheld, owner] = await Promise.all([
+    search(question, visibleTo(caller)),
+    search(question, EVERYTHING),
+    pemilik(),
+  ]);
+  const citations = grounded(retrieved, retrieved);
 
-  const auditId = await recordAsk({ caller, question, retrieved, answer, askedAt });
+  let answer: Omit<Answer, "auditId">;
+  let reason: Reason | null = null;
+  if (citations.length) {
+    answer = { text: render(citations), decision: "answered", citations };
+  } else if (subjects(question).length) {
+    // Decided from the question alone, so the reply cannot reveal whether withheld data exists.
+    answer = { text: refusal(owner), decision: "refusal", citations: [] };
+    reason = withheld.length ? "restricted" : "not_found";
+  } else {
+    answer = { text: "Saya tidak tahu.", decision: "unknown_routed", citations: [] };
+  }
+
+  // Identity data never leaves the engine unmasked.
+  answer = {
+    ...answer,
+    text: mask(answer.text),
+    citations: answer.citations.map((citation) => ({ ...citation, text: mask(citation.text) })),
+  };
+
+  const auditId = await recordAsk({ caller, question, retrieved, answer, reason, askedAt });
   return { ...answer, auditId };
+}
+
+/** The one reply for Restricted and for absent data, so the asker cannot tell which. */
+function refusal(owner: Staff): string {
+  return `Saya tidak menemukan informasi yang dapat saya tampilkan untuk permintaan ini. Jika Anda yakin data ini ada, hubungi ${owner.name}.`;
 }
 
 /** Drops any citation whose text is not in the retrieved chunk it names. */

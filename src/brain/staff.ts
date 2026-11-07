@@ -21,3 +21,12 @@ async function sha256(text: string): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
   return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
+
+/** The Pemilik, the one Role that may see all Restricted data, named in every Refusal. */
+export async function pemilik(): Promise<Staff> {
+  const staff = await env.DB.prepare(
+    "SELECT id, name, role FROM staff WHERE role = 'Pemilik'",
+  ).first<Staff>();
+  if (!staff) throw new Error("The clinic has no Pemilik");
+  return staff;
+}

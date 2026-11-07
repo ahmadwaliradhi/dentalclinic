@@ -1,5 +1,5 @@
 import { env } from "cloudflare:workers";
-import type { Answer } from "./ask";
+import type { Answer, Reason } from "./ask";
 import { mask } from "./mask";
 import type { Chunk } from "./search";
 import type { Staff } from "./staff";
@@ -9,14 +9,22 @@ interface AskEntry {
   question: string;
   retrieved: Chunk[];
   answer: Omit<Answer, "auditId">;
+  reason: Reason | null;
   askedAt: string;
 }
 
 /** Appends one Jejak Audit row and returns its id. */
-export async function recordAsk({ caller, question, retrieved, answer, askedAt }: AskEntry) {
+export async function recordAsk({
+  caller,
+  question,
+  retrieved,
+  answer,
+  reason,
+  askedAt,
+}: AskEntry) {
   const id = await env.DB.prepare(
-    `INSERT INTO jejak_audit (staff_id, role, question, retrieved, cited, answer, decision, asked_at, answered_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id`,
+    `INSERT INTO jejak_audit (staff_id, role, question, retrieved, cited, answer, decision, reason, asked_at, answered_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id`,
   )
     .bind(
       caller.id,
@@ -26,6 +34,7 @@ export async function recordAsk({ caller, question, retrieved, answer, askedAt }
       JSON.stringify(answer.citations.map((citation) => citation.uri)),
       answer.text,
       answer.decision,
+      reason,
       askedAt,
       new Date().toISOString(),
     )
