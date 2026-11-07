@@ -60,6 +60,7 @@ it("shows the launch link, Expert zips and video from data", async () => {
   expectLink(release.launchUrl, "href");
   expectLink(release.expertZipUrl, "href");
   expectLink(release.videoEmbedUrl, "src");
+  expect(html).toMatch(/<h2\b[^>]*id="video-title"[^>]*>Video Demo</);
   expect(html).not.toMatch(/href=""|src=""/);
 });
 

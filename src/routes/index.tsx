@@ -211,12 +211,13 @@ function Landing() {
             className="h-auto w-full"
           />
         </Section>
-        <Section id="video" title="Video">
+        <Section id="video" title="Video Demo">
           {release.videoEmbedUrl ? (
             <iframe
               src={release.videoEmbedUrl}
-              title="Demo Dental Clinic Brain"
-              allow="encrypted-media; picture-in-picture"
+              title="Video Demo Dental Clinic Brain"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
               allowFullScreen
               className="aspect-video w-full rounded-xl border"
             />
