@@ -37,7 +37,7 @@ _Avoid_: cost ratio, expense rate
 ## People
 
 **Role**:
-The access level a staff member holds; one of Pemilik, Dokter Gigi Mitra, TGM, Front Office.
+The access level a staff member holds; one of Pemilik, Dokter Gigi Mitra, Perawat Gigi, Front Office.
 _Avoid_: user type, permission group
 
 **Pemilik**:
@@ -52,9 +52,9 @@ _Avoid_: associate, doctor, drg. (as a role name)
 Surat Izin Praktik, a dentist's five-year licence to practise at one clinic; the Klinik Brain warns from 90 days before it ends.
 _Avoid_: license, izin (unqualified), STR (which is lifelong)
 
-**TGM**:
-Terapis Gigi dan Mulut; sees records of cases they assisted, stock, and sterilisation logs, never finance.
-_Avoid_: nurse, assistant, perawat gigi
+**Perawat Gigi**:
+A dental nurse who assists the dentist; sees records of cases they assisted, stock, and sterilisation logs, never finance.
+_Avoid_: TGM, Terapis Gigi dan Mulut, nurse, assistant
 
 **Front Office**:
 Reception and cashier staff; sees schedules, masked contact details, tariffs and SOPs, never clinical notes or finance.
@@ -105,7 +105,7 @@ A human's accept or decline of a Proposal; expiry without a decision counts as d
 _Avoid_: confirmation, sign-off
 
 **Restricted**:
-Data that exists but the asking Role may not see: clinical notes for Front Office, another dentist's patients or fees, and clinic-wide Keuangan & Aset figures, for a Dokter Gigi Mitra, finance for TGM and Front Office, and unmasked NIK for anyone.
+Data that exists but the asking Role may not see: clinical notes for Front Office, another dentist's patients or fees, and clinic-wide Keuangan & Aset figures, for a Dokter Gigi Mitra, finance for Perawat Gigi and Front Office, and unmasked NIK for anyone.
 _Avoid_: private, hidden, forbidden
 
 **Source**:

@@ -88,7 +88,7 @@ const FINANCE = [
 
 it("gives Tari, Nina and drg. Andi the Refusal for finance questions, through ask too", async () => {
   const others: Staff[] = [
-    { id: "tari", name: "Tari", role: "TGM" },
+    { id: "tari", name: "Tari", role: "Perawat Gigi" },
     { id: "nina", name: "Nina", role: "Front Office" },
     { id: "andi", name: "drg. Andi", role: "Dokter Gigi Mitra" },
   ];

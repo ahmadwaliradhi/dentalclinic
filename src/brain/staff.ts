@@ -1,7 +1,7 @@
 import { env } from "cloudflare:workers";
 import { sha256 } from "./sha256";
 
-export type Role = "Pemilik" | "Dokter Gigi Mitra" | "TGM" | "Front Office";
+export type Role = "Pemilik" | "Dokter Gigi Mitra" | "Perawat Gigi" | "Front Office";
 
 export interface Staff {
   id: string;

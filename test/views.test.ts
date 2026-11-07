@@ -5,7 +5,7 @@ import { asetFor, patientsFor, scheduleFor, stockCard } from "../src/brain/views
 
 const rina: Staff = { id: "rina", name: "drg. Rina", role: "Pemilik" };
 const andi: Staff = { id: "andi", name: "drg. Andi", role: "Dokter Gigi Mitra" };
-const tari: Staff = { id: "tari", name: "Tari", role: "TGM" };
+const tari: Staff = { id: "tari", name: "Tari", role: "Perawat Gigi" };
 const nina: Staff = { id: "nina", name: "Nina", role: "Front Office" };
 
 const UNMASKED = /\d(?:[\s-]?\d){9}/;

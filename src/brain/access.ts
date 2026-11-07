@@ -18,7 +18,7 @@ export function visibleTo(caller: Staff): Guard {
       return EVERYTHING;
     case "Dokter Gigi Mitra":
       return { sql: `sources.area IS NULL OR ${GRANTED}`, params: [caller.id] };
-    case "TGM":
+    case "Perawat Gigi":
       return {
         sql: `sources.area IS NULL OR (sources.area = 'clinical' AND ${GRANTED})`,
         params: [caller.id],
@@ -39,7 +39,7 @@ export function visitsVisibleTo(caller: Staff): Guard {
 
 /**
  * Patients the caller may list, as an SQL condition on `patients`: every patient for the Pemilik
- * and Front Office, a Dokter Gigi Mitra's own, and those a TGM assisted.
+ * and Front Office, a Dokter Gigi Mitra's own, and those a Perawat Gigi assisted.
  */
 export function patientsVisibleTo(caller: Staff): Guard {
   switch (caller.role) {
@@ -48,7 +48,7 @@ export function patientsVisibleTo(caller: Staff): Guard {
       return EVERYTHING;
     case "Dokter Gigi Mitra":
       return { sql: "patients.dentist_id = ?", params: [caller.id] };
-    case "TGM":
+    case "Perawat Gigi":
       return {
         sql: "patients.no_rm IN (SELECT patient_no FROM visits WHERE assistant_id = ?)",
         params: [caller.id],
@@ -58,7 +58,7 @@ export function patientsVisibleTo(caller: Staff): Guard {
 
 /**
  * Proposals the caller may decide, as an SQL condition on `proposals`: every one for the Pemilik, a
- * Dokter Gigi Mitra's own patients' Recall Messages, Stok Opname Requests for a TGM, none for
+ * Dokter Gigi Mitra's own patients' Recall Messages, Stok Opname Requests for a Perawat Gigi, none for
  * Front Office.
  */
 export function proposalsDecidedBy(caller: Staff): Guard {
@@ -70,7 +70,7 @@ export function proposalsDecidedBy(caller: Staff): Guard {
         sql: "proposals.patient_no IN (SELECT no_rm FROM patients WHERE dentist_id = ?)",
         params: [caller.id],
       };
-    case "TGM":
+    case "Perawat Gigi":
       return { sql: "proposals.kind = 'stok_opname'", params: [] };
     case "Front Office":
       return { sql: "FALSE", params: [] };

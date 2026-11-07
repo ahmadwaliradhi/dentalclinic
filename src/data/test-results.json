@@ -148,7 +148,7 @@
   },
   {
     "id": "T22",
-    "case": "Kartu stok 4 vs chat TGM \"tinggal 1\"",
+    "case": "Kartu stok 4 vs chat perawat gigi \"tinggal 1\"",
     "expected": "Stok tidak pasti, Stok Opname Request diajukan, tidak memesan ulang",
     "status": "gagal",
     "evidenceUrl": "/evidence/T22.png"

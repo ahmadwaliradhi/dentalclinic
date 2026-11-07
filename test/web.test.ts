@@ -10,7 +10,7 @@ const nina: Staff = { id: "nina", name: "Nina", role: "Front Office" };
 it.each([
   ["rina", "drg. Rina", "Pemilik"],
   ["andi", "drg. Andi", "Dokter Gigi Mitra"],
-  ["tari", "Tari", "TGM"],
+  ["tari", "Tari", "Perawat Gigi"],
   ["nina", "Nina", "Front Office"],
 ])("signs in as %s through Demo Login and shows their name and Role", async (id, name, role) => {
   const response = await get("/pasien", await demoLogin(id));

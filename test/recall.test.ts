@@ -8,7 +8,7 @@ import type { Staff } from "../src/brain/staff";
 const rina: Staff = { id: "rina", name: "drg. Rina", role: "Pemilik" };
 const andi: Staff = { id: "andi", name: "drg. Andi", role: "Dokter Gigi Mitra" };
 const maya: Staff = { id: "maya", name: "drg. Maya, Sp.Ort", role: "Dokter Gigi Mitra" };
-const tari: Staff = { id: "tari", name: "Tari", role: "TGM" };
+const tari: Staff = { id: "tari", name: "Tari", role: "Perawat Gigi" };
 const nina: Staff = { id: "nina", name: "Nina", role: "Front Office" };
 
 /** The seed's "today": 7 November 2026, 10.00 WIB. */
