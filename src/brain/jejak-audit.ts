@@ -23,8 +23,8 @@ export async function recordAsk({
   askedAt,
 }: AskEntry) {
   const id = await env.DB.prepare(
-    `INSERT INTO jejak_audit (staff_id, role, question, retrieved, cited, answer, decision, reason, asked_at, answered_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id`,
+    `INSERT INTO jejak_audit (staff_id, role, question, retrieved, cited, answer, decision, reason, flags, asked_at, answered_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id`,
   )
     .bind(
       caller.id,
@@ -35,6 +35,7 @@ export async function recordAsk({
       answer.text,
       answer.decision,
       reason,
+      JSON.stringify(answer.flags),
       askedAt,
       new Date().toISOString(),
     )

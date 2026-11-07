@@ -49,7 +49,7 @@ it("says it does not know when no Source matches", async () => {
 
   expect(answer).toMatchObject({
     decision: "unknown_routed",
-    text: "Saya tidak tahu.",
+    text: "Saya tidak tahu. Tanyakan ke drg. Rina.",
     citations: [],
   });
 });
@@ -93,7 +93,7 @@ it("writes exactly one Jejak Audit row per ask, answered or not", async () => {
   expect(await auditRow(unknown.auditId)).toMatchObject({
     retrieved: "[]",
     cited: "[]",
-    answer: "Saya tidak tahu.",
+    answer: "Saya tidak tahu. Tanyakan ke drg. Rina.",
     decision: "unknown_routed",
   });
 });

@@ -1,11 +1,15 @@
 import { env } from "cloudflare:workers";
 import type { Guard } from "./access";
+import type { Role } from "./staff";
 
 export interface Chunk {
   uri: string;
   /** When the Source was issued, sent or logged, as UTC ISO 8601. */
   dated: string;
   text: string;
+  /** Shared by Sources stating the same fact; see Source Conflict. */
+  fact: string | null;
+  authorRole: Role;
 }
 
 const STOPWORDS = words(
@@ -29,8 +33,8 @@ export async function search(question: string, guard: Guard): Promise<Chunk[]> {
   if (keywords.length === 0) return [];
 
   const { results } = await env.DB.prepare(
-    `SELECT sources.uri, sources.dated, sources.body AS text
-     FROM source_search JOIN sources USING (uri)
+    `SELECT sources.uri, sources.dated, sources.body AS text, sources.fact, staff.role AS authorRole
+     FROM source_search JOIN sources USING (uri) JOIN staff ON staff.id = sources.author_id
      WHERE source_search MATCH ?
        AND (sources.subject IS NULL OR sources.subject IN (SELECT value FROM json_each(?)))
        AND (${guard.sql})
