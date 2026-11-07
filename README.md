@@ -2,7 +2,7 @@
 
 Live: [dentalclinic.ahmadwaliradhi.workers.dev](https://dentalclinic.ahmadwaliradhi.workers.dev)
 
-One TanStack Start application on one Cloudflare Worker, with D1. The site is Indonesian; staff talk to the Klinik Brain only through WorkBuddy. Domain vocabulary lives in [GLOSSARY.md](GLOSSARY.md), architecture in [docs/adr](docs/adr/).
+One TanStack Start application on one Cloudflare Worker, with D1. The site is Indonesian; staff talk to the Klinik Brain only through WorkBuddy, over MCP at `/mcp`. Domain vocabulary lives in [GLOSSARY.md](GLOSSARY.md), architecture in [docs/adr](docs/adr/).
 
 ## Run
 
@@ -28,7 +28,7 @@ npm test
 
 `npm run check` runs those four in order, which is what CI runs.
 
-`npm test` builds the real Worker, migrates and seeds local D1 with the commands above, then runs Vitest **inside workerd**, not Node or jsdom. The database test reads that actual persistent local D1 through a test-only service binding backed by Wrangler's local platform proxy. HTTP and scheduled tests invoke the compiled Worker; scheduled tests use an isolated D1 binding. Tests never access remote D1.
+`npm test` builds the real Worker, migrates and seeds local D1 with the commands above, then runs Vitest **inside workerd**, not Node or jsdom. The database test reads that actual persistent local D1 through a test-only service binding backed by Wrangler's local platform proxy. Every other test runs against an isolated D1 that `test/setup.ts` loads with the same migrations and seed. Engine tests call `ask` in `src/brain/` directly; HTTP and scheduled tests invoke the compiled Worker. Tests never access remote D1.
 
 For a focused test after a source change:
 
@@ -39,9 +39,24 @@ npx vitest run test/page.test.ts
 
 `npm run format` formats maintained files. Generated routes and runtime types are excluded. Run `npm run cf:types` after changing Worker bindings; the build regenerates `src/routeTree.gen.ts`. Generated types and route tree are committed so typecheck works immediately after install.
 
+## MCP
+
+`POST /mcp` is a stateless Streamable HTTP MCP server with two tools:
+
+- `who_am_i` returns the staff member and Role behind the bearer token.
+- `ask` returns the answer envelope: `text` (final, cited, shown verbatim), `decision`, `citations` (URI, date, quoted text) and `auditId`. Every call writes one Jejak Audit row.
+
+The caller comes only from the bearer token. Until Identity Pairing lands, four public demo tokens stand in for Demo Login: `demo-rina`, `demo-andi`, `demo-tari` and `demo-nina`. Only their SHA-256 hashes are stored. A missing or unknown token gets 401. Production needs `npm run db:seed -- --remote` once for the tokens to exist.
+
+```sh
+npx @modelcontextprotocol/inspector --cli http://localhost:5173/mcp --transport http \
+  --header "Authorization: Bearer demo-nina" \
+  --method tools/call --tool-name ask --tool-arg "question=Jam praktik klinik?"
+```
+
 ## Database
 
-`db/migrations/0001_scaffold.sql` creates only an infrastructure marker table. `db/seed.sql` inserts one marker without overwriting existing data. Both commands are safe to repeat; clinic schema and fictional records belong to later tickets.
+`db/migrations/` holds the schema: staff, token hashes, Sources (`doc://`, `chat://`, `task://`) with an FTS5 keyword index kept in sync by triggers, and the Jejak Audit. `db/seed.sql` loads the fictional Klinik Gigi Senyum Sejahtera without overwriting existing rows. Both commands are safe to repeat.
 
 ```sh
 npm run db:migrate -- --local
