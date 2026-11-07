@@ -153,7 +153,7 @@ npm run expert:install
 
 `npm run expert:install -- dentalclinic-team` installs one. Then open Experts → My Experts → Dira Cepat and ask "Jam praktik klinik?", or the DentalClinic Team and ask "Siapa yang belum selesai PSA bulan lalu? Buatkan pengingat." as drg. Rina. The Expert gives a pairing link: open it, sign in with Demo Login, press Hubungkan WorkBuddy and say it is done. Paste the token it returns when WorkBuddy asks to connect `dental-clinic-brain`. Accept the resulting Proposals under Persetujuan. To switch staff member, remove `dental-clinic-brain` under Connectors, pair again and start a New Task.
 
-From a downloaded zip: unzip it into `~/.workbuddy-ai/plugins/marketplaces/my-experts/plugins/` and ask WorkBuddy to "validate and register the expert dentalclinic-team" (or `dira-cepat`), which runs the same expert-manager scripts. To share one, use ⋯ → Share → Copy link on the Expert in WorkBuddy and put the link in `launchUrl` in `src/data/release.json`.
+From a downloaded zip: unzip it into `~/.workbuddy-ai/plugins/marketplaces/my-experts/plugins/` and ask WorkBuddy to "validate and register the expert dentalclinic-team" (or `dira-cepat`), which runs the same expert-manager scripts. To share one, use ⋯ → Share → Copy link on the Expert in WorkBuddy and put the link in `src/data/release.json`: `launchUrl` for Dira Cepat, `teamLaunchUrl` for the DentalClinic Team. A launch link installs one Expert, so the landing page shows Buka di WorkBuddy and Buka Tim di WorkBuddy side by side in the header, and Buka Tim di WorkBuddy again under Tim.
 
 ## Database
 
@@ -233,7 +233,7 @@ For a separate Cloudflare account, create its D1 database and replace only `data
 
 `/` is the Indonesian landing page. Its links and test results are data, not code:
 
-- `src/data/release.json`: WorkBuddy launch link, Expert zips, video embed URL and GitHub link. An empty value shows "Segera tersedia"; an empty `teamZipUrl` hides its button.
+- `src/data/release.json`: WorkBuddy launch links for the Expert and the Team, Expert zips, video embed URL and GitHub link. An empty value shows "Segera tersedia"; an empty `teamLaunchUrl` or `teamZipUrl` hides its button.
 - `src/data/test-results.json`: one row per test case. `status` is `lulus`, `gagal` or `belum`; `evidenceUrl` links the status to a screenshot in `public/evidence/`.
 
 Edit the JSON and redeploy.

@@ -96,7 +96,7 @@ const accountability = [
 const install: Step = release.launchUrl
   ? {
       title: "Klik Buka di WorkBuddy.",
-      body: "Tombolnya di bagian atas halaman. Belum punya WorkBuddy? Pasang dan masuk dulu, lalu klik lagi. WorkBuddy menambahkan Expert Dental Clinic Brain dan DentalClinic Team.",
+      body: "Tombolnya di bagian atas halaman. Belum punya WorkBuddy? Pasang dan masuk dulu, lalu klik lagi. WorkBuddy menambahkan Expert Dental Clinic Brain.",
     }
   : {
       title: "Tambahkan Expert ke WorkBuddy.",
@@ -137,7 +137,8 @@ const quickStart: Step[] = [
   },
   {
     title: "Coba DentalClinic Team.",
-    body: "Klik New Task, pilih DentalClinic Team, lalu tanya “Siapa yang belum selesai PSA bulan lalu? Buatkan pengingat.”",
+    // Each WorkBuddy launch link installs one Expert, so the Team has its own button.
+    body: `${release.teamLaunchUrl ? "Klik Buka Tim di WorkBuddy di bagian atas halaman. WorkBuddy menambahkan DentalClinic Team. " : ""}Klik New Task, pilih DentalClinic Team, lalu tanya “Siapa yang belum selesai PSA bulan lalu? Buatkan pengingat.”`,
   },
 ];
 
@@ -176,11 +177,18 @@ function Landing() {
         <Hero />
         <Section id="tim" title="Tim">
           <Terms terms={team} className="grid-cols-2 sm:grid-cols-4" />
-          {release.teamZipUrl && (
-            <Button asChild variant="outline" className="mt-8">
-              <a href={release.teamZipUrl}>Unduh Tim</a>
-            </Button>
-          )}
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            {release.teamLaunchUrl && (
+              <Button asChild>
+                <a href={release.teamLaunchUrl}>Buka Tim di WorkBuddy</a>
+              </Button>
+            )}
+            {release.teamZipUrl && (
+              <Button asChild variant="outline">
+                <a href={release.teamZipUrl}>Unduh Tim</a>
+              </Button>
+            )}
+          </div>
         </Section>
         <Section id="prinsip" title="Setiap jawaban">
           <Terms terms={principles} className="sm:grid-cols-3" />
@@ -264,7 +272,7 @@ function SiteHeader() {
   return (
     <header
       id="site-header"
-      className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 py-5"
+      className="flex flex-col items-start gap-x-6 gap-y-3 py-5 md:flex-row md:items-center md:justify-between"
     >
       <span className="flex items-center gap-2 font-semibold">
         <img src="/favicon.svg" alt="" width={24} height={24} className="size-6" />
@@ -275,17 +283,30 @@ function SiteHeader() {
         <img src="/workbuddy.png" alt="" width={24} height={24} className="size-6 rounded-md" />
         <span>WorkBuddy AI</span>
       </span>
-      <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium">
-        <a href="#hasil-uji" className="hover:text-primary">
-          Hasil Uji Agents
-        </a>
-        <a href="#video" className="hover:text-primary">
-          Cek Video Demo
-        </a>
-        {release.launchUrl && (
-          <Button asChild size="sm">
-            <a href={release.launchUrl}>Buka di WorkBuddy</a>
-          </Button>
+      {/* Links and both launch buttons don't fit one row beside the logos, so they stack.
+          Beside the logos only from md, where the stack fits; below that everything aligns left. */}
+      <nav className="flex flex-col items-start gap-3 text-sm font-medium md:items-end">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+          <a href="#hasil-uji" className="hover:text-primary">
+            Hasil Uji Agents
+          </a>
+          <a href="#video" className="hover:text-primary">
+            Cek Video Demo
+          </a>
+        </div>
+        {(release.launchUrl || release.teamLaunchUrl) && (
+          <div className="flex flex-wrap gap-2">
+            {release.launchUrl && (
+              <Button asChild size="sm">
+                <a href={release.launchUrl}>Buka di WorkBuddy</a>
+              </Button>
+            )}
+            {release.teamLaunchUrl && (
+              <Button asChild size="sm" variant="outline">
+                <a href={release.teamLaunchUrl}>Buka Tim di WorkBuddy</a>
+              </Button>
+            )}
+          </div>
         )}
       </nav>
     </header>
