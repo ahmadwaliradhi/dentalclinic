@@ -266,18 +266,12 @@ function SiteHeader() {
       className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 py-5"
     >
       <span className="flex items-center gap-2 font-semibold">
-        <img src="/favicon.svg" alt="Dental Clinic" width={24} height={24} className="size-6" />
+        <img src="/favicon.svg" alt="" width={24} height={24} className="size-6" />
         <span>Dental Clinic</span>
         <span aria-hidden="true" className="text-muted-foreground">
           ×
         </span>
-        <img
-          src="/workbuddy.png"
-          alt="WorkBuddy AI"
-          width={24}
-          height={24}
-          className="size-6 rounded-md"
-        />
+        <img src="/workbuddy.png" alt="" width={24} height={24} className="size-6 rounded-md" />
         <span>WorkBuddy AI</span>
       </span>
       <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium">

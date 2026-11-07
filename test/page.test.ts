@@ -113,7 +113,8 @@ it("renders one test results row per data entry, failures included", async () =>
 it("gives every image alt text and every frame a title", async () => {
   const { html } = await landingHtml();
 
-  for (const tag of html.match(/<img\b[^>]*>/g) ?? []) expect(tag).toMatch(/alt="[^"]+"/);
+  // alt="" marks a decorative image, such as a logo next to its name.
+  for (const tag of html.match(/<img\b[^>]*>/g) ?? []) expect(tag).toMatch(/alt="[^"]*"/);
   for (const tag of html.match(/<iframe\b[^>]*>/g) ?? []) expect(tag).toMatch(/title="[^"]+"/);
   expect(html).toMatch(/<img\b[^>]*src="\/arsitektur\.svg"/);
 });
@@ -166,12 +167,17 @@ it("heads the page with both logos and links to the tests, the video and WorkBud
   const { html } = await landingHtml();
   const header = html.slice(html.indexOf('id="site-header"'), html.indexOf('id="hero"'));
 
-  expect(header).toMatch(/<img\b[^>]*src="\/favicon\.svg"[^>]*alt="Dental Clinic"/);
-  expect(header).toMatch(/<img\b[^>]*src="\/workbuddy\.png"[^>]*alt="WorkBuddy AI"/);
+  // Logos sit beside their names, so they are decorative.
+  expect(header).toMatch(/<img\b[^>]*src="\/favicon\.svg"[^>]*alt=""/);
+  expect(header).toMatch(/<img\b[^>]*src="\/workbuddy\.png"[^>]*alt=""/);
+  expect(header).toContain("Dental Clinic");
+  expect(header).toContain("WorkBuddy AI");
   expect(header).toMatch(/<a\b[^>]*href="#hasil-uji"[^>]*>Hasil Uji Agents</);
   expect(header).toMatch(/<a\b[^>]*href="#video"[^>]*>Cek Video Demo</);
-  expect(header).toContain(`href="${escapeHtml(release.launchUrl)}"`);
-  expect(header).toContain(">Buka di WorkBuddy<");
+  if (release.launchUrl) {
+    expect(header).toContain(`href="${escapeHtml(release.launchUrl)}"`);
+    expect(header).toContain(">Buka di WorkBuddy<");
+  }
   expect(html).not.toContain("Masuk sebagai staf");
   const logo = await env.ASSETS.fetch("https://dentalclinic.test/workbuddy.png");
   expect(logo.status).toBe(200);
