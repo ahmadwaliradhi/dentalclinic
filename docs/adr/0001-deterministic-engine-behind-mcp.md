@@ -1,0 +1,3 @@
+# Accountability lives in a deterministic engine behind MCP, not in prompts
+
+WorkBuddy cannot be called inbound and does not let an Expert restrict its own tools, so permission checks, masking, conflict handling, citation validation and audit logging run as code in a Cloudflare Worker exposed as MCP tools. WorkBuddy's model plans and calls those tools; the engine composes the final cited answer text and the Expert renders it verbatim. We rejected also running an LLM on the Worker (a web chat on the site): staff use the Klinik Brain only through WorkBuddy, and a second surface would double the accountability work.
