@@ -1,7 +1,12 @@
 import { exports } from "cloudflare:workers";
 import { expect, it } from "vitest";
+import { ask } from "../src/brain/ask";
+import type { Staff } from "../src/brain/staff";
 
 const SITE = "https://dentalclinic.test";
+
+const andi: Staff = { id: "andi", name: "drg. Andi", role: "Dokter Gigi Mitra" };
+const nina: Staff = { id: "nina", name: "Nina", role: "Front Office" };
 
 /** Signs in through Demo Login and returns the session cookie. */
 async function demoLogin(id: string): Promise<string> {
@@ -44,7 +49,7 @@ it("offers Demo Login only for the four seeded staff members", async () => {
   expect(response.headers.get("set-cookie")).toBeNull();
 });
 
-it.each(["/pasien", "/jadwal", "/stok", "/aset"])(
+it.each(["/pasien", "/jadwal", "/stok", "/aset", "/jejak-audit"])(
   "sends a logged-out visitor of %s to the Demo Login",
   async (path) => {
     const response = await get(path);
@@ -103,4 +108,27 @@ it("gives drg. Rina Aset finance figures through the same server function", asyn
 
 it("refuses the server function without a session", async () => {
   expect((await asetServerFn()).status).toBe(401);
+});
+
+it("shows Nina her own Jejak Audit rows, a Refusal without its reason, and a verified chain", async () => {
+  await ask(nina, "Apa diagnosis pasien P-0007?");
+  await ask(andi, "Tarif scaling?");
+
+  const html = await (await get("/jejak-audit", await demoLogin("nina"))).text();
+
+  expect(html).toContain("Rantai terverifikasi");
+  expect(html).toContain("Apa diagnosis pasien P-0007?");
+  expect(html).toContain("Refusal");
+  expect(html).not.toContain("Tarif scaling?");
+  expect(html).not.toMatch(/restricted|not_found/);
+});
+
+it("shows drg. Rina every Jejak Audit row with its Refusal reason", async () => {
+  await ask(nina, "Apa diagnosis pasien P-0007?");
+
+  const html = await (await get("/jejak-audit", await demoLogin("rina"))).text();
+
+  expect(html).toContain("Rantai terverifikasi");
+  expect(html).toContain("Apa diagnosis pasien P-0007?");
+  expect(html).toContain("restricted");
 });

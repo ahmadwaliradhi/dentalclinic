@@ -1,4 +1,5 @@
 import { env } from "cloudflare:workers";
+import { sha256 } from "./sha256";
 
 export type Role = "Pemilik" | "Dokter Gigi Mitra" | "TGM" | "Front Office";
 
@@ -49,11 +50,6 @@ export async function closeSession(secret: string): Promise<void> {
   await env.DB.prepare("DELETE FROM sessions WHERE hash = ?")
     .bind(await sha256(secret))
     .run();
-}
-
-async function sha256(text: string): Promise<string> {
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
-  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
 /** The Pemilik, the one Role that may see all Restricted data, named in every Refusal. */

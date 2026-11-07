@@ -38,9 +38,10 @@ export async function ask(caller: Staff, question: string): Promise<Answer> {
   if (kpiTopic(question)) return kpi(caller, question);
 
   const askedAt = new Date().toISOString();
+  const filter = visibleTo(caller);
   // Every step runs for every question, so Restricted and absent data take the same path.
   const [retrieved, withheld, owner] = await Promise.all([
-    search(question, visibleTo(caller)),
+    search(question, filter),
     search(question, EVERYTHING),
     pemilik(),
   ]);
@@ -70,7 +71,7 @@ export async function ask(caller: Staff, question: string): Promise<Answer> {
     citations: answer.citations.map((citation) => ({ ...citation, text: mask(citation.text) })),
   };
 
-  const auditId = await recordAsk({ caller, question, retrieved, answer, reason, askedAt });
+  const auditId = await recordAsk({ caller, filter, question, retrieved, answer, reason, askedAt });
   return { ...answer, auditId };
 }
 
