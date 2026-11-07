@@ -62,3 +62,12 @@ it("ask over MCP returns the engine's answer envelope for the token's staff memb
       .first(),
   ).toEqual({ staff_id: "nina", role: "Front Office" });
 });
+
+it("lists no finance tools for Front Office or TGM (T18)", async () => {
+  for (const token of ["demo-nina", "demo-tari"]) {
+    const response = await post(token, "tools/list");
+    const { result } = await response.json<{ result: { tools: { name: string }[] } }>();
+
+    expect(result.tools.map((tool) => tool.name)).toEqual(["who_am_i", "ask"]);
+  }
+});

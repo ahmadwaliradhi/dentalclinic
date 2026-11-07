@@ -12,6 +12,7 @@ export async function handleMcp(request: Request): Promise<Response> {
     return new Response(null, { status: 401, headers: { "WWW-Authenticate": "Bearer" } });
   }
 
+  // A finance tool must register only for the Pemilik and Dokter Gigi Mitra; T18 pins the rest.
   const server = new McpServer({ name: "dentalclinic", version: "1.0.0" });
 
   server.registerTool(
