@@ -16,7 +16,14 @@ export const Route = createFileRoute("/_klinik/jejak-audit")({
   component: JejakAudit,
 });
 
-const DECISION = { answered: "Dijawab", refusal: "Refusal", unknown_routed: "Tidak tahu" };
+const DECISION = {
+  answered: "Dijawab",
+  refusal: "Refusal",
+  unknown_routed: "Tidak tahu",
+  proposed: "Diusulkan",
+  accepted: "Diterima",
+  declined: "Ditolak",
+};
 
 function JejakAudit() {
   const { verified, rows } = Route.useLoaderData();

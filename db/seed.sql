@@ -296,3 +296,10 @@ INSERT INTO stock_items (item, quantity, unit, counted_at) VALUES
   ('Masker medis', 8, 'kotak', '2026-10-31T09:00:00Z'),
   ('Kapas gulung', 5, 'pak', '2026-10-31T09:00:00Z')
 ON CONFLICT DO NOTHING;
+
+-- An already-expired Recall Message no one decided; the expiry job declines it and logs that (T12).
+INSERT INTO proposals (id, kind, patient_no, text, proposed_by, proposed_at, expires_at) VALUES
+  (1, 'recall_message', 'P-0035',
+    'Halo Sinta Maharani, ini Klinik Gigi Senyum Sejahtera. Sudah waktunya Anda kembali ke klinik bersama drg. Rina. Balas pesan ini untuk memilih jadwal yang cocok. Terima kasih.',
+    'rina', '2026-11-05T02:00:00Z', '2026-11-06T02:00:00Z')
+ON CONFLICT DO NOTHING;

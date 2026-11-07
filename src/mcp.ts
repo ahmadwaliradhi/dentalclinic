@@ -4,6 +4,7 @@ import { z } from "zod";
 import { ask } from "./brain/ask";
 import { kpi } from "./brain/kpi";
 import { staffForToken } from "./brain/pairing";
+import { dueForRecall, proposeRecallMessages } from "./brain/recall";
 
 /** Stateless MCP endpoint. The bearer token alone decides who is calling. */
 export async function handleMcp(request: Request): Promise<Response> {
@@ -33,6 +34,28 @@ export async function handleMcp(request: Request): Promise<Response> {
       annotations: { readOnlyHint: true },
     },
     async ({ question }) => toolResult(await ask(caller, question)),
+  );
+
+  server.registerTool(
+    "due_for_recall",
+    {
+      description:
+        "Patients Due for Recall that this staff member may see, each with the reason and its Source. Show `text` to the user exactly as returned.",
+      annotations: { readOnlyHint: true },
+    },
+    async () => toolResult(await dueForRecall(caller)),
+  );
+
+  // Proposing is as far as an agent goes: no tool accepts, declines or sends a Proposal.
+  server.registerTool(
+    "propose_recall_message",
+    {
+      description:
+        "Prepare a Recall Message Proposal for each patient Due for Recall with WA Opt-in, or only the given No RM. Nothing is sent: a human accepts each one on the site within 24 hours, then sends it. Show `text` to the user exactly as returned.",
+      inputSchema: { patients: z.array(z.string()).optional() },
+      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true },
+    },
+    async ({ patients }) => toolResult(await proposeRecallMessages(caller, new Date(), patients)),
   );
 
   // Finance tools register for the Pemilik alone; T18 pins the rest.

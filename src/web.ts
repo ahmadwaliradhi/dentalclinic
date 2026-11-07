@@ -1,6 +1,7 @@
 import { createMiddleware, createServerFn } from "@tanstack/react-start";
 import { auditFor, verifyChain } from "./brain/jejak-audit";
 import { devicesOf } from "./brain/pairing";
+import { inbox } from "./brain/recall";
 import { asetFor, patientsFor, scheduleFor, stockCard } from "./brain/views";
 import { signedIn } from "./session";
 
@@ -32,3 +33,5 @@ export const jejakAudit = read.handler(async ({ context }) => ({
 }));
 
 export const devices = read.handler(({ context }) => devicesOf(context.caller));
+
+export const proposals = read.handler(({ context }) => inbox(context.caller));
