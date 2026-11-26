@@ -61,9 +61,9 @@ Reply with the `text` of every result, in the order of the request, separated by
 
 When `dental-clinic-brain` is not connected, a tool or member reports 401 or `not connected`, or the staff member asks to connect, pair this WorkBuddy with them, then start again at Phase 1:
 
-1. Run `curl -s -X POST https://dentalclinic.ahmadwaliradhi.workers.dev/pairing`. It returns `code`, `url` and `secret`. Never show `secret`.
+1. Run `curl -s -X POST https://dentalclinic.web.id/pairing`. It returns `code`, `url` and `secret`. Never show `secret`.
 2. Give the staff member `url` and `code`, and ask them to open the link, sign in and press **Hubungkan WorkBuddy** within 10 minutes. Then wait for them.
-3. Run `curl -s -w '\n%{http_code}' -X POST https://dentalclinic.ahmadwaliradhi.workers.dev/pairing/token -H 'Content-Type: application/json' -d '{"secret":"<secret>"}'`.
+3. Run `curl -s -w '\n%{http_code}' -X POST https://dentalclinic.web.id/pairing/token -H 'Content-Type: application/json' -d '{"secret":"<secret>"}'`.
    - `200`: give them `token` and ask them to paste it as the Staff token when WorkBuddy asks to connect `dental-clinic-brain`. It is shown only this once.
    - `202`: the code is not confirmed yet. Ask them to press Hubungkan WorkBuddy, then run step 3 again.
    - `401`: the code expired. Start again at step 1.
