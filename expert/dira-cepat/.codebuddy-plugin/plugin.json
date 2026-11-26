@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Answers Klinik Gigi Senyum Sejahtera staff from the Dental Clinic Brain over MCP, with sources.",
   "author": { "name": "Ahmad Wali Radhi" },
-  "homepage": "https://dentalclinic.ahmadwaliradhi.workers.dev",
+  "homepage": "https://dentalclinic.web.id",
   "license": "MIT",
   "agents": ["./agents/dira-cepat.md"],
   "expertType": "agent",
@@ -31,7 +31,7 @@
   "mcpServers": {
     "dental-clinic-brain": {
       "type": "http",
-      "url": "https://dentalclinic.ahmadwaliradhi.workers.dev/mcp",
+      "url": "https://dentalclinic.web.id/mcp",
       "headers": { "Authorization": "Bearer ${DENTALCLINIC_TOKEN}" },
       "x-workbuddy": {
         "displayName": "Dental Clinic Brain",

@@ -94,7 +94,7 @@ it("reaches the Dental Clinic Brain over MCP with a staff token typed into WorkB
   const server = cepat.mcpServers["dental-clinic-brain"];
 
   // WorkBuddy imports the server with `new URL(url)`, then fills ${KEY} from the form fields.
-  expect(new URL(server.url).href).toBe("https://dentalclinic.ahmadwaliradhi.workers.dev/mcp");
+  expect(new URL(server.url).href).toBe("https://dentalclinic.web.id/mcp");
   expect(server.headers).toEqual({ Authorization: "Bearer ${DENTALCLINIC_TOKEN}" });
   expect(server["x-workbuddy"].auth).toMatchObject({
     type: "token",
@@ -106,6 +106,17 @@ it("reaches the Dental Clinic Brain over MCP with a staff token typed into WorkB
     expect(JSON.stringify(plugin) + Object.values(prompts).join()).not.toMatch(
       /demo-(rina|andi|tari|nina)/,
     );
+  }
+});
+
+it("pairs and connects through the custom domain, since Indonesian DNS blocks *.workers.dev", () => {
+  // Some Indonesian resolvers send *.workers.dev to a host whose certificate does not match, so
+  // the pairing curl fails and WorkBuddy never receives a Staff token.
+  for (const { plugin, prompts } of experts) {
+    const text = JSON.stringify(plugin) + Object.values(prompts).join();
+    expect(text, plugin.name).not.toContain("workers.dev");
+    const hosts = new Set([...text.matchAll(/https:\/\/([^/\s"'`)]+)/g)].map((m) => m[1]));
+    expect([...hosts], plugin.name).toEqual(["dentalclinic.web.id"]);
   }
 });
 
